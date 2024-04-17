@@ -1,0 +1,4 @@
+# we track only the config file from these directories
+config/
+data/
+downloads/

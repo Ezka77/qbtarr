@@ -1,0 +1,81 @@
+services:
+  # for hotio images, a docker compose is provided at:
+  # https://hotio.dev/containers/qbittorrent/#starting-the-container
+  prowlarr:
+    image: ghcr.io/hotio/prowlarr
+    container_name: prowlarr
+    hostname: prowlarr
+    restart: unless-stopped
+    env_file:
+      - ./hotio.env
+    ports:
+      - 9696:9696
+    volumes:
+      - ./config/prowlarr:/config
+
+  sonarr:
+    image: ghcr.io/hotio/sonarr
+    container_name: sonarr
+    hostname: sonarr
+    restart: unless-stopped
+    env_file:
+      - ./hotio.env
+    ports:
+      - 8989:8989
+    volumes:
+      - ./config/sonarr:/config
+      - ./data/sonarr:/data
+      - ./downloads:/downloads
+
+  radarr:
+    image: ghcr.io/hotio/radarr
+    container_name: radarr
+    hostname: radarr
+    restart: unless-stopped
+    env_file:
+      - ./hotio.env
+    ports:
+      - 7878:7878
+    volumes:
+      - ./config/radarr:/config
+      - ./data/radarr:/data
+      - ./downloads:/downloads
+
+  qbittorrent:
+    image: ghcr.io/hotio/qbittorrent:latest
+    container_name: qbittorrent
+    hostname: qbittorrent
+    restart: unless-stopped
+    env_file:
+      - ./hotio.env
+    environment:
+      WEBUI_PORTS: "8080/tcp,8080/udp"
+    ports:
+      - 8080:8080
+      - 6881:6881
+      - 6881:6881/udp
+    volumes:
+      - ./config/qbt:/config
+      - ./data/qbt:/data
+      - ./downloads:/downloads
+
+  # using more or less the same configuration but the nginx container is not coming from hotio
+  nginx:
+    depends_on: 
+      - prowlarr
+      - sonarr
+      - radarr
+      - qbittorrent
+    restart: unless-stopped
+    image: nginx
+    container_name: nginx
+    hostname: nginx
+    env_file:
+      - ./hotio.env
+    ports:
+      - 80:80
+    volumes:
+      - type: bind
+        source: ./config/nginx/qbtarr.conf
+        target: /etc/nginx/conf.d/00-qbtarr.conf
+        read_only: true
