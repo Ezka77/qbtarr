@@ -4,7 +4,16 @@ Some minimum services from servarr in a docker compose wrapper file
 
 ## How to use
 
-`docker compose up -d` next you should have access to the servarr services and qbittorrent at:
+Create a `build` directory, call `cmake ../` from this directory, next use custom target `start` and `stop` to call docker compose up/down.
+
+```
+mkdir build
+cd build
+cmake ../
+cmake start
+```
+
+You should have access to the servarr services and qbittorrent at:
 
 - http://localhost/prowlarr
 - http://localhost/sonarr
