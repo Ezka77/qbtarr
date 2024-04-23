@@ -24,8 +24,7 @@ services:
       - 8989:8989
     volumes:
       - ./config/sonarr:/config
-      - ./data/sonarr:/data
-      - ./downloads:/downloads
+      - ./data:/data
 
   radarr:
     image: ghcr.io/hotio/radarr
@@ -38,8 +37,18 @@ services:
       - 7878:7878
     volumes:
       - ./config/radarr:/config
-      - ./data/radarr:/data
-      - ./downloads:/downloads
+      - ./data:/data
+
+  lidarr:
+    container_name: lidarr
+    image: ghcr.io/hotio/lidarr
+    ports:
+      - 8686:8686
+    env_file:
+      - ./hotio.env
+    volumes:
+      - ./config/lidarr:/config
+      - ./data:/data
 
   qbittorrent:
     image: ghcr.io/hotio/qbittorrent:latest
@@ -56,8 +65,7 @@ services:
       - 6881:6881/udp
     volumes:
       - ./config/qbt:/config
-      - ./data/qbt:/data
-      - ./downloads:/downloads
+      - ./data:/data
 
   # using more or less the same configuration but the nginx container is not coming from hotio
   nginx:

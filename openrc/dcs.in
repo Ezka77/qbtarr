@@ -1,4 +1,4 @@
-#!@OPENRCDIR@/openrc-run
+#!/@OPENRCDIR@/openrc-run
 
 depend(){
  need localmount docker
