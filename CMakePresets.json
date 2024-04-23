@@ -1,0 +1,32 @@
+{
+  "version": 7,
+  "configurePresets": [
+    {
+      "name": "default",
+      "displayName": "Default Config",
+      "description": "Generates docker configuration",
+      "binaryDir": "${sourceDir}/build"
+    },
+    {
+      "name": "openrc",
+      "displayName": "Add OpenRC scripts",
+      "description": "Generates openrc scripts",
+      "inherits": "default",
+      "cacheVariables": {
+        "OPENRC": "ON"
+      }
+    }
+  ],
+  "buildPresets": [
+    {
+      "name": "start",
+      "configurePreset": "default",
+      "targets": [ "start"]
+    },
+    {
+      "name": "stop",
+      "configurePreset": "default",
+      "targets": [ "stop"]
+    }
+  ]
+}
