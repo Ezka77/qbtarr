@@ -91,7 +91,7 @@ services:
     volumes:
       - /run/mpd/socket:/run/mpd/socket
       - ./mympd/data:/var/lib/mympd/
-      - ./mympd/cachedir:/var/cache/mympd/
+      - ./mympd/cache:/var/cache/mympd/
       - /media/music:/music/:ro
       - /var/lib/mpd/playlists:/playlists/:ro
     restart: unless-stopped

@@ -40,7 +40,7 @@ file(MAKE_DIRECTORY
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/series
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/movies
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/mympd/data
-  ${CMAKE_BINARY_DIR}/${WORK_DIR}/mympd/cachedir
+  ${CMAKE_BINARY_DIR}/${WORK_DIR}/mympd/cache
 )
 file(COPY config DESTINATION ${WORK_DIR})
 
