@@ -9,7 +9,7 @@ services:
     env_file:
       - ./hotio.env
     ports:
-      - 9696:9696
+      - "9696:9696"
     volumes:
       - ./config/prowlarr:/config
 
@@ -21,7 +21,7 @@ services:
     env_file:
       - ./hotio.env
     ports:
-      - 8989:8989
+      - "8989:8989"
     volumes:
       - ./config/sonarr:/config
       - ./data:/data
@@ -34,7 +34,7 @@ services:
     env_file:
       - ./hotio.env
     ports:
-      - 7878:7878
+      - "7878:7878"
     volumes:
       - ./config/radarr:/config
       - ./data:/data
@@ -43,7 +43,7 @@ services:
     container_name: lidarr
     image: ghcr.io/hotio/lidarr
     ports:
-      - 8686:8686
+      - "8686:8686"
     env_file:
       - ./hotio.env
     volumes:
@@ -60,9 +60,9 @@ services:
     environment:
       WEBUI_PORTS: "8080/tcp,8080/udp"
     ports:
-      - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
+      - "8080:8080"
+      - "6881:6881"
+      - "6881:6881/udp"
     volumes:
       - ./config/qbt:/config
       - ./data:/data
@@ -81,9 +81,13 @@ services:
     env_file:
       - ./hotio.env
     ports:
-      - 80:80
+      - "80:80"
     volumes:
       - type: bind
         source: ./config/nginx/qbtarr.conf
         target: /etc/nginx/conf.d/00-qbtarr.conf
         read_only: true
+
+networks:
+  dcsnet:
+    name: dcsnet
