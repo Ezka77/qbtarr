@@ -12,6 +12,8 @@ services:
       - "9696:9696"
     volumes:
       - ./config/prowlarr:/config
+    networks:
+      - qbtarrnet
 
   sonarr:
     image: ghcr.io/hotio/sonarr
@@ -25,6 +27,8 @@ services:
     volumes:
       - ./config/sonarr:/config
       - ./data:/data
+    networks:
+      - qbtarrnet
 
   radarr:
     image: ghcr.io/hotio/radarr
@@ -38,6 +42,8 @@ services:
     volumes:
       - ./config/radarr:/config
       - ./data:/data
+    networks:
+      - qbtarrnet
 
   lidarr:
     container_name: lidarr
@@ -49,6 +55,8 @@ services:
     volumes:
       - ./config/lidarr:/config
       - ./data:/data
+    networks:
+      - qbtarrnet
 
   qbittorrent:
     image: ghcr.io/hotio/qbittorrent:latest
@@ -66,6 +74,29 @@ services:
     volumes:
       - ./config/qbt:/config
       - ./data:/data
+    networks:
+      - qbtarrnet
+
+  mympd:
+    image: ghcr.io/jcorporation/mympd/mympd:latest
+    container_name: mympd
+    # network_mode: "host"
+    user: 1000:1000
+    environment:
+      - UMASK_SET=022
+      - MYMPD_SSL=false
+      - MYMPD_HTTP_PORT=8668
+    ports:
+      - "8668:8668"
+    volumes:
+      - /run/mpd/socket:/run/mpd/socket
+      - ./mympd/data:/var/lib/mympd/
+      - ./mympd/cachedir:/var/cache/mympd/
+      - /media/music:/music/:ro
+      - /var/lib/mpd/playlists:/playlists/:ro
+    restart: unless-stopped
+    networks:
+      - dcsnet
 
   # using more or less the same configuration but the nginx container is not coming from hotio
   nginx:
@@ -74,7 +105,8 @@ services:
       - sonarr
       - radarr
       - qbittorrent
-    restart: unless-stopped
+      - mympd
+    # restart: unless-stopped
     image: nginx
     container_name: nginx
     hostname: nginx
@@ -87,7 +119,11 @@ services:
         source: ./config/nginx/qbtarr.conf
         target: /etc/nginx/conf.d/00-qbtarr.conf
         read_only: true
+    networks:
+      - qbtarrnet
 
 networks:
+  qbtarrnet:
+    name: qbtarrnet
   dcsnet:
     name: dcsnet

@@ -39,12 +39,21 @@ file(MAKE_DIRECTORY
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/music
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/series
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/movies
+  ${CMAKE_BINARY_DIR}/${WORK_DIR}/mympd/data
+  ${CMAKE_BINARY_DIR}/${WORK_DIR}/mympd/cachedir
 )
 file(COPY config DESTINATION ${WORK_DIR})
 
 # Quick & Dirty custom targets
 # commands to start/stop containers with a target - shortcut to test our install
 add_custom_target(start
+  COMMAND docker compose up
+  WORKING_DIRECTORY ${WORK_DIR}
+  COMMENT "start containers"
+  VERBATIM
+)
+
+add_custom_target(startd
   COMMAND docker compose up -d
   WORKING_DIRECTORY ${WORK_DIR}
   COMMENT "start containers"

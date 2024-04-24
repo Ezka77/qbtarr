@@ -20,12 +20,17 @@
   "buildPresets": [
     {
       "name": "start",
-      "configurePreset": "default",
+      "configurePreset": "openrc",
       "targets": [ "start"]
     },
     {
+      "name": "startd",
+      "configurePreset": "openrc",
+      "targets": [ "startd"]
+    },
+    {
       "name": "stop",
-      "configurePreset": "default",
+      "configurePreset": "openrc",
       "targets": [ "stop"]
     }
   ]
