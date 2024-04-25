@@ -2,7 +2,7 @@
   "version": 7,
   "configurePresets": [
     {
-      "name": "default",
+      "name": "srvarr",
       "displayName": "Default Config",
       "description": "Generates docker configuration",
       "binaryDir": "${sourceDir}/build"
@@ -11,26 +11,37 @@
       "name": "openrc",
       "displayName": "Add OpenRC scripts",
       "description": "Generates openrc scripts",
-      "inherits": "default",
+      "inherits": "srvarr",
       "cacheVariables": {
         "OPENRC": "ON"
+      }
+    },
+    {
+      "name": "all",
+      "displayName": "All options to ON",
+      "description": "Generates everythings everywhere",
+      "inherits": "srvarr",
+      "cacheVariables": {
+        "OPENRC": "ON",
+        "NGINX": "ON",
+        "MYMPD": "ON"
       }
     }
   ],
   "buildPresets": [
     {
       "name": "start",
-      "configurePreset": "openrc",
+      "configurePreset": "all",
       "targets": [ "start"]
     },
     {
       "name": "startd",
-      "configurePreset": "openrc",
+      "configurePreset": "all",
       "targets": [ "startd"]
     },
     {
       "name": "stop",
-      "configurePreset": "openrc",
+      "configurePreset": "all",
       "targets": [ "stop"]
     }
   ]

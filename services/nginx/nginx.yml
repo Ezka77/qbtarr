@@ -1,0 +1,22 @@
+services:
+# using more or less the same configuration as hotio
+  nginx:
+    # restart: unless-stopped
+    image: nginx
+    container_name: nginx
+    hostname: nginx
+    env_file:
+      - ./hotio.env
+    ports:
+      - "80:80"
+    volumes:
+      - type: bind
+        source: ./services/nginx/nginx.conf
+        target: /etc/nginx/nginx.conf
+        read_only: true
+      - type: bind
+        source: ./services/nginx/qbtarr.d
+        target: /etc/nginx/qbtarr.d
+        read_only: true
+    networks:
+      - qbtarrnet

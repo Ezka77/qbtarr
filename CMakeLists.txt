@@ -7,6 +7,9 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "/" CACHE PATH "..." FORCE)
 endif()
 
+set(INSTALL_INIT etc/init.d)
+set(INSTALL_VAR var/lib/dcs)
+
 set(ROOTFS generated)
 set(SVCNAME ${CMAKE_PROJECT_NAME})
 
@@ -18,11 +21,31 @@ set(PGID 1000)
 set(UMASK 002)
 set(TZ Europe/Paris)
 
+# Init scripts
 option(OPENRC "Add OpenRC init script" OFF)
 
-# normalize paths and set definitive paths
+# *arr servers
+#option(PROWLARR "Add the *arr server" OFF)
+#option(LIDARR   "Add the *arr server" OFF)
+#option(RADARR   "Add the *arr server" OFF)
+#option(SONARR   "Add the *arr server" OFF)
+
+# multimedia servers
+option(MYMPD   "Add myMPD server" OFF)
+
+# frontend
+option(NGINX   "Add NginX as reverse proxy" OFF)
+
+# normalize and set definitive paths
 cmake_path(SET DSC_DIR NORMALIZE ${ROOTFS}/dcs)
 cmake_path(SET WORK_DIR NORMALIZE ${ROOTFS}/${SVCNAME})
+
+# TODO: split the CMake file and add_directories ? or add a cmake module with a function like
+# add_services(mympd) which will:
+# - add the subdirectory where we define a list of directories to create in a variable
+# - create theses runtime directorie eg: services/mympd/[cache, config]
+# - add to nginx (if enabled) the service configuration for it
+# - add an include for the docker compose yml
 
 # configure files
 if (${OPENRC})
@@ -30,8 +53,26 @@ if (${OPENRC})
   # create a dcs sub-service
   file(CREATE_LINK  dcs  ${CMAKE_BINARY_DIR}/${DSC_DIR}/dcs.${SVCNAME} SYMBOLIC)
 endif()
-configure_file(docker-compose.yml ${WORK_DIR}/docker-compose.yml @ONLY)
-configure_file(hotio.env ${WORK_DIR}/hotio.env @ONLY)
+
+# create includes to configure our docker-compose file and add optional services
+set(DC_INCLUDES "# include of optional services\ninclude:")
+if (${MYMPD})
+  list(APPEND DC_INCLUDES "mympd.yml")
+endif()
+if (${NGINX})
+  # add docker service
+  list(APPEND DC_INCLUDES "nginx.yml")
+endif()
+
+set(DC_INC "---")
+list(LENGTH DC_INCLUDES NB_INCLUDES)
+if ( ${NB_INCLUDES} GREATER 1)
+  # join strings to create a YAML list
+  list(JOIN DC_INCLUDES "\n  - " DC_INC)
+endif()
+
+configure_file(docker-compose.yml.in ${WORK_DIR}/compose.yml @ONLY)
+configure_file(hotio.env.in ${WORK_DIR}/hotio.env @ONLY)
 
 # add directory tree - relative to source directory
 file(MAKE_DIRECTORY 
@@ -39,10 +80,30 @@ file(MAKE_DIRECTORY
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/music
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/series
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/movies
-  ${CMAKE_BINARY_DIR}/${WORK_DIR}/mympd/data
-  ${CMAKE_BINARY_DIR}/${WORK_DIR}/mympd/cache
 )
 file(COPY config DESTINATION ${WORK_DIR})
+
+if (${MYMPD})
+  file(MAKE_DIRECTORY 
+    ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/mympd/data
+    ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/mympd/cache
+  )
+  file(COPY_FILE services/mympd/mympd.yml ${CMAKE_BINARY_DIR}/${WORK_DIR}/mympd.yml ONLY_IF_DIFFERENT)
+endif()
+
+if (${NGINX})
+  file(COPY services/nginx/qbtarr.d DESTINATION ${WORK_DIR}/services/nginx)
+  file(COPY_FILE 
+    services/nginx/nginx.yml 
+    ${CMAKE_BINARY_DIR}/${WORK_DIR}/nginx.yml 
+    ONLY_IF_DIFFERENT
+  )
+  file(COPY_FILE 
+    services/nginx/nginx.conf 
+    ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/nginx/nginx.conf 
+    ONLY_IF_DIFFERENT
+  )
+endif()
 
 # Quick & Dirty custom targets
 # commands to start/stop containers with a target - shortcut to test our install
@@ -68,10 +129,10 @@ add_custom_target(stop
   VERBATIM
 )
 
-# Install
+# Install the generated files in var/lib/dcs
 install(DIRECTORY 
   ${CMAKE_BINARY_DIR}/${WORK_DIR}
-  DESTINATION var/lib/dcs
+  DESTINATION ${INSTALL_VAR}
   USE_SOURCE_PERMISSIONS
   COMPONENT ${CMAKE_PROJECT_NAME}
 )
@@ -81,6 +142,6 @@ install(DIRECTORY
 install(FILES
   ${CMAKE_BINARY_DIR}/${DSC_DIR}/dcs
   ${CMAKE_BINARY_DIR}/${DSC_DIR}/dcs.${SVCNAME}
-  DESTINATION etc/init.d/
+  DESTINATION ${INSTALL_INIT}
   CONFIGURATIONS WithOpenRC
 )

@@ -1,0 +1,21 @@
+services:
+  mympd:
+    image: ghcr.io/jcorporation/mympd/mympd:latest
+    container_name: mympd
+    # network_mode: "host"
+    user: 1000:1000
+    environment:
+      - UMASK_SET=022
+      - MYMPD_SSL=false
+      - MYMPD_HTTP_PORT=8668
+    ports:
+      - "8668:8668"
+    volumes:
+      - /run/mpd/socket:/run/mpd/socket
+      - ./services/mympd/data:/var/lib/mympd/
+      - ./services/mympd/cache:/var/cache/mympd/
+      - /media/music:/music/:ro
+      - /var/lib/mpd/playlists:/playlists/:ro
+    restart: unless-stopped
+    networks:
+      - dcsnet

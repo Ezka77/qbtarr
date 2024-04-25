@@ -13,7 +13,7 @@ if [ "${SUBSVC}" = "dcs" ]; then
 fi
 
 DCS_DIR="${DCS_DIR:-@DCS_DIR@}"
-DCS_FILE="${DCS_FILE:-docker-compose.yml}"
+DCS_FILE="${DCS_FILE:-compose.yml}"
 DCS_CFG="${DCS_DIR}/${SUBSVC}/${DCS_FILE}"
 
 command="${DOCKER_CMD:-/usr/bin/docker}"
