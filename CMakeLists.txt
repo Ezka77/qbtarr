@@ -30,6 +30,8 @@ option(OPENRC "Add OpenRC init script" OFF)
 #option(RADARR   "Add the *arr server" OFF)
 #option(SONARR   "Add the *arr server" OFF)
 
+option(QBT   "Add the qbittorrent client" OFF)
+
 # multimedia servers
 option(MYMPD   "Add myMPD server" OFF)
 
@@ -63,6 +65,10 @@ if (${NGINX})
   # add docker service
   list(APPEND DC_INCLUDES "nginx.yml")
 endif()
+if (${QBT})
+  # add docker service
+  list(APPEND DC_INCLUDES "qbt.yml")
+endif()
 
 set(DC_INC "---")
 list(LENGTH DC_INCLUDES NB_INCLUDES)
@@ -71,7 +77,7 @@ if ( ${NB_INCLUDES} GREATER 1)
   list(JOIN DC_INCLUDES "\n  - " DC_INC)
 endif()
 
-configure_file(docker-compose.yml.in ${WORK_DIR}/compose.yml @ONLY)
+configure_file(compose.yml.in ${WORK_DIR}/compose.yml @ONLY)
 configure_file(hotio.env.in ${WORK_DIR}/hotio.env @ONLY)
 
 # add directory tree - relative to source directory
@@ -82,6 +88,11 @@ file(MAKE_DIRECTORY
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/movies
 )
 file(COPY config DESTINATION ${WORK_DIR})
+
+if (${QBT})
+  file(COPY services/qbittorrent/config DESTINATION ${WORK_DIR}/services/qbittorrent)
+  file(COPY_FILE ./services/qbittorrent/qbt.yml ${CMAKE_BINARY_DIR}/${WORK_DIR}/qbt.yml ONLY_IF_DIFFERENT)
+endif()
 
 if (${MYMPD})
   file(MAKE_DIRECTORY 

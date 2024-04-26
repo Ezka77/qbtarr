@@ -24,7 +24,8 @@
       "cacheVariables": {
         "OPENRC": "ON",
         "NGINX": "ON",
-        "MYMPD": "ON"
+        "MYMPD": "ON",
+        "QBT": "ON"
       }
     }
   ],
