@@ -30,14 +30,15 @@ option(OPT_MYMPD    "Add myMPD server"           OFF)
 option(OPT_NGINX    "Add NginX as reverse proxy" OFF)
 
 set(OPENRC_DIR  sbin)    # OpenRC-run directory (/sbin)
-set(DSC_DIR  dcs)
-set(WORK_DIR ${SVCNAME})
+set(GEN_DIR generate)
+set(DCS_DIR  ${GEN_DIR}/dcs)
+set(WORK_DIR ${GEN_DIR}/${SVCNAME})
 
 # configure files
 if (${OPT_OPENRC})
-  configure_file(openrc/dcs.in ${DSC_DIR}/dcs @ONLY)
+  configure_file(openrc/dcs.in ${DCS_DIR}/dcs @ONLY)
   # create a dcs sub-service
-  file(CREATE_LINK  dcs  ${CMAKE_BINARY_DIR}/${DSC_DIR}/dcs.${SVCNAME} SYMBOLIC)
+  file(CREATE_LINK  dcs  ${CMAKE_BINARY_DIR}/${DCS_DIR}/dcs.${SVCNAME} SYMBOLIC)
 endif()
 
 # create includes to configure our docker-compose file and add optional services
@@ -122,8 +123,8 @@ install(DIRECTORY
 
 # Theses ones can stay as root:root
 install(FILES
-  ${CMAKE_BINARY_DIR}/${DSC_DIR}/dcs
-  ${CMAKE_BINARY_DIR}/${DSC_DIR}/dcs.${SVCNAME}
+  ${CMAKE_BINARY_DIR}/${DCS_DIR}/dcs
+  ${CMAKE_BINARY_DIR}/${DCS_DIR}/dcs.${SVCNAME}
   DESTINATION ${INSTALL_INIT}
   CONFIGURATIONS WithOpenRC
 )
