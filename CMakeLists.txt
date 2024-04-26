@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.27)
 
 project(qbtarr VERSION 0.0.1)
 
-# For now: if install prefix is default-ed use / as we build our own rootfs
+# For now: if install prefix is default-ed use /
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "/" CACHE PATH "..." FORCE)
 endif()
@@ -10,10 +10,7 @@ endif()
 set(INSTALL_INIT etc/init.d)
 set(INSTALL_VAR var/lib/dcs)
 
-set(GEN_DIR generated)
 set(SVCNAME ${CMAKE_PROJECT_NAME})
-
-set(OPENRC_DIR  sbin)         # "OpenRC-run directory (/sbin)"
 
 # containers env 
 set(PUID 1000)
@@ -22,21 +19,19 @@ set(UMASK 002)
 set(TZ Europe/Paris)
 
 # Init scripts
-option(OPT_OPENRC "Add OpenRC init script" OFF)
-
+option(OPT_OPENRC   "Add OpenRC init script"     OFF)
 # *arr servers
-option(OPT_PROWLARR "Add the *arr server" OFF)
-option(OPT_LIDARR   "Add the *arr server" OFF)
-option(OPT_RADARR   "Add the *arr server" OFF)
-option(OPT_SONARR   "Add the *arr server" OFF)
+option(OPT_PROWLARR "Add the prowlarr server"    ON )
+option(OPT_LIDARR   "Add the lidarr server"      OFF)
+option(OPT_RADARR   "Add the radarr server"      OFF)
+option(OPT_SONARR   "Add the sonarr server"      OFF)
+option(OPT_QBT      "Add the qbittorrent client" OFF)
+option(OPT_MYMPD    "Add myMPD server"           OFF)
+option(OPT_NGINX    "Add NginX as reverse proxy" OFF)
 
-option(OPT_QBT     "Add the qbittorrent client" OFF)
-option(OPT_MYMPD   "Add myMPD server"           OFF)
-option(OPT_NGINX   "Add NginX as reverse proxy" OFF)
-
-# normalize and set definitive paths
-cmake_path(SET DSC_DIR NORMALIZE  ${GEN_DIR}/dcs)
-cmake_path(SET WORK_DIR NORMALIZE ${GEN_DIR}/${SVCNAME})
+set(OPENRC_DIR  sbin)    # OpenRC-run directory (/sbin)
+set(DSC_DIR  dcs)
+set(WORK_DIR ${SVCNAME})
 
 # configure files
 if (${OPT_OPENRC})
@@ -56,10 +51,6 @@ file(MAKE_DIRECTORY
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/movies
 )
 
-# Add a service:
-# - add the service_name.yml file to list
-# - copy the service_name.yml file
-# - if there is a config directory, copy it
 function(add_service option name)
   if (${option})
     list(APPEND INCLUDE_LIST "\
@@ -71,11 +62,11 @@ function(add_service option name)
 endfunction()
 
 add_service(${OPT_PROWLARR} prowlarr)
-add_service(${OPT_LIDARR} lidarr)
-add_service(${OPT_RADARR} radarr)
-add_service(${OPT_SONARR} sonarr)
-add_service(${OPT_QBT} qbittorrent)
-add_service(${OPT_MYMPD} mympd)
+add_service(${OPT_LIDARR}   lidarr)
+add_service(${OPT_RADARR}   radarr)
+add_service(${OPT_SONARR}   sonarr)
+add_service(${OPT_QBT}      qbittorrent)
+add_service(${OPT_MYMPD}    mympd)
 if (${OPT_MYMPD})
   file(MAKE_DIRECTORY 
     ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/mympd/data
@@ -93,7 +84,7 @@ if ( ${NB_INCLUDES} GREATER 1)
 endif()
 
 configure_file(compose.yml.in ${WORK_DIR}/compose.yml @ONLY)
-configure_file(srv.env.in ${WORK_DIR}/srv.env @ONLY)
+configure_file(srv.env.in     ${WORK_DIR}/srv.env @ONLY)
 
 
 # Quick & Dirty custom targets
