@@ -6,7 +6,7 @@ services:
     container_name: nginx
     hostname: nginx
     env_file:
-      - ./hotio.env
+      - ./srv.env
     ports:
       - "80:80"
     volumes:

@@ -22,10 +22,14 @@
       "description": "Generates everythings everywhere",
       "inherits": "srvarr",
       "cacheVariables": {
-        "OPENRC": "ON",
-        "NGINX": "ON",
-        "MYMPD": "ON",
-        "QBT": "ON"
+        "OPT_OPENRC": "ON",
+        "OPT_NGINX": "ON",
+        "OPT_MYMPD": "ON",
+        "OPT_QBT": "ON",
+        "OPT_LIDARR": "ON",
+        "OPT_PROWLARR": "ON",
+        "OPT_RADARR": "ON",
+        "OPT_SONARR": "ON"
       }
     }
   ],

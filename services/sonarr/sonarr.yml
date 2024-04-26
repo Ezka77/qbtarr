@@ -1,0 +1,15 @@
+services:
+  sonarr:
+    image: ghcr.io/hotio/sonarr
+    container_name: sonarr
+    hostname: sonarr
+    restart: unless-stopped
+    env_file:
+      - srv.env
+    ports:
+      - "8989:8989"
+    volumes:
+      - ./services/sonarr/config:/config
+      - ./data:/data
+    networks:
+      - qbtarrnet

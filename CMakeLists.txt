@@ -10,7 +10,7 @@ endif()
 set(INSTALL_INIT etc/init.d)
 set(INSTALL_VAR var/lib/dcs)
 
-set(ROOTFS generated)
+set(GEN_DIR generated)
 set(SVCNAME ${CMAKE_PROJECT_NAME})
 
 set(OPENRC_DIR  sbin)         # "OpenRC-run directory (/sbin)"
@@ -22,99 +22,79 @@ set(UMASK 002)
 set(TZ Europe/Paris)
 
 # Init scripts
-option(OPENRC "Add OpenRC init script" OFF)
+option(OPT_OPENRC "Add OpenRC init script" OFF)
 
 # *arr servers
-#option(PROWLARR "Add the *arr server" OFF)
-#option(LIDARR   "Add the *arr server" OFF)
-#option(RADARR   "Add the *arr server" OFF)
-#option(SONARR   "Add the *arr server" OFF)
+option(OPT_PROWLARR "Add the *arr server" OFF)
+option(OPT_LIDARR   "Add the *arr server" OFF)
+option(OPT_RADARR   "Add the *arr server" OFF)
+option(OPT_SONARR   "Add the *arr server" OFF)
 
-option(QBT   "Add the qbittorrent client" OFF)
-
-# multimedia servers
-option(MYMPD   "Add myMPD server" OFF)
-
-# frontend
-option(NGINX   "Add NginX as reverse proxy" OFF)
+option(OPT_QBT     "Add the qbittorrent client" OFF)
+option(OPT_MYMPD   "Add myMPD server"           OFF)
+option(OPT_NGINX   "Add NginX as reverse proxy" OFF)
 
 # normalize and set definitive paths
-cmake_path(SET DSC_DIR NORMALIZE ${ROOTFS}/dcs)
-cmake_path(SET WORK_DIR NORMALIZE ${ROOTFS}/${SVCNAME})
-
-# TODO: split the CMake file and add_directories ? or add a cmake module with a function like
-# add_services(mympd) which will:
-# - add the subdirectory where we define a list of directories to create in a variable
-# - create theses runtime directorie eg: services/mympd/[cache, config]
-# - add to nginx (if enabled) the service configuration for it
-# - add an include for the docker compose yml
+cmake_path(SET DSC_DIR NORMALIZE  ${GEN_DIR}/dcs)
+cmake_path(SET WORK_DIR NORMALIZE ${GEN_DIR}/${SVCNAME})
 
 # configure files
-if (${OPENRC})
+if (${OPT_OPENRC})
   configure_file(openrc/dcs.in ${DSC_DIR}/dcs @ONLY)
   # create a dcs sub-service
   file(CREATE_LINK  dcs  ${CMAKE_BINARY_DIR}/${DSC_DIR}/dcs.${SVCNAME} SYMBOLIC)
 endif()
 
 # create includes to configure our docker-compose file and add optional services
-set(DC_INCLUDES "# include of optional services\ninclude:")
-if (${MYMPD})
-  list(APPEND DC_INCLUDES "mympd.yml")
-endif()
-if (${NGINX})
-  # add docker service
-  list(APPEND DC_INCLUDES "nginx.yml")
-endif()
-if (${QBT})
-  # add docker service
-  list(APPEND DC_INCLUDES "qbt.yml")
-endif()
+set(INCLUDE_LIST "# include of optional services\ninclude:")
 
-set(DC_INC "---")
-list(LENGTH DC_INCLUDES NB_INCLUDES)
-if ( ${NB_INCLUDES} GREATER 1)
-  # join strings to create a YAML list
-  list(JOIN DC_INCLUDES "\n  - " DC_INC)
-endif()
-
-configure_file(compose.yml.in ${WORK_DIR}/compose.yml @ONLY)
-configure_file(hotio.env.in ${WORK_DIR}/hotio.env @ONLY)
-
-# add directory tree - relative to source directory
+# create shared directories
 file(MAKE_DIRECTORY 
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/downloads
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/music
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/series
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/movies
 )
-file(COPY config DESTINATION ${WORK_DIR})
 
-if (${QBT})
-  file(COPY services/qbittorrent/config DESTINATION ${WORK_DIR}/services/qbittorrent)
-  file(COPY_FILE ./services/qbittorrent/qbt.yml ${CMAKE_BINARY_DIR}/${WORK_DIR}/qbt.yml ONLY_IF_DIFFERENT)
-endif()
+# Add a service:
+# - add the service_name.yml file to list
+# - copy the service_name.yml file
+# - if there is a config directory, copy it
+function(add_service option name)
+  if (${option})
+    list(APPEND INCLUDE_LIST "\
+  - path: services/${name}/${name}.yml\n\
+    project_directory: .")
+    set(INCLUDE_LIST ${INCLUDE_LIST} PARENT_SCOPE)
+    file(COPY services/${name} DESTINATION ${WORK_DIR}/services)
+  endif()
+endfunction()
 
-if (${MYMPD})
+add_service(${OPT_PROWLARR} prowlarr)
+add_service(${OPT_LIDARR} lidarr)
+add_service(${OPT_RADARR} radarr)
+add_service(${OPT_SONARR} sonarr)
+add_service(${OPT_QBT} qbittorrent)
+add_service(${OPT_MYMPD} mympd)
+if (${OPT_MYMPD})
   file(MAKE_DIRECTORY 
     ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/mympd/data
     ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/mympd/cache
   )
-  file(COPY_FILE services/mympd/mympd.yml ${CMAKE_BINARY_DIR}/${WORK_DIR}/mympd.yml ONLY_IF_DIFFERENT)
+endif()
+add_service(${OPT_NGINX} nginx)
+
+## Create the compose.yml with the list of included files
+set(INCLUDE_SERVICES "---")
+list(LENGTH INCLUDE_LIST NB_INCLUDES)
+if ( ${NB_INCLUDES} GREATER 1)
+  # join strings to create a YAML list
+  list(JOIN INCLUDE_LIST "\n" INCLUDE_SERVICES)
 endif()
 
-if (${NGINX})
-  file(COPY services/nginx/qbtarr.d DESTINATION ${WORK_DIR}/services/nginx)
-  file(COPY_FILE 
-    services/nginx/nginx.yml 
-    ${CMAKE_BINARY_DIR}/${WORK_DIR}/nginx.yml 
-    ONLY_IF_DIFFERENT
-  )
-  file(COPY_FILE 
-    services/nginx/nginx.conf 
-    ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/nginx/nginx.conf 
-    ONLY_IF_DIFFERENT
-  )
-endif()
+configure_file(compose.yml.in ${WORK_DIR}/compose.yml @ONLY)
+configure_file(srv.env.in ${WORK_DIR}/srv.env @ONLY)
+
 
 # Quick & Dirty custom targets
 # commands to start/stop containers with a target - shortcut to test our install

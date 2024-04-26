@@ -1,0 +1,15 @@
+services:
+  radarr:
+    image: ghcr.io/hotio/radarr
+    container_name: radarr
+    hostname: radarr
+    restart: unless-stopped
+    env_file:
+      - srv.env
+    ports:
+      - "7878:7878"
+    volumes:
+      - ./services/radarr/config:/config
+      - ./data:/data
+    networks:
+      - qbtarrnet

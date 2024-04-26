@@ -5,7 +5,7 @@ services:
     hostname: qbittorrent
     restart: unless-stopped
     env_file:
-      - ./hotio.env
+      - srv.env
     environment:
       WEBUI_PORTS: "8080/tcp,8080/udp"
     ports:

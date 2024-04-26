@@ -1,0 +1,16 @@
+services:
+  # for hotio images, a docker compose is provided at:
+  # https://hotio.dev/containers/qbittorrent/#starting-the-container
+  prowlarr:
+    image: ghcr.io/hotio/prowlarr
+    container_name: prowlarr
+    hostname: prowlarr
+    restart: unless-stopped
+    env_file:
+      - srv.env
+    ports:
+      - "9696:9696"
+    volumes:
+      - ./services/prowlarr/config:/config
+    networks:
+      - qbtarrnet
