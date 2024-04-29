@@ -19,15 +19,18 @@ set(UMASK 002)
 set(TZ Europe/Paris)
 
 # Init scripts
-option(OPT_OPENRC   "Add OpenRC init script"     OFF)
-# *arr servers
-option(OPT_PROWLARR "Add the prowlarr server"    ON )
-option(OPT_LIDARR   "Add the lidarr server"      OFF)
-option(OPT_RADARR   "Add the radarr server"      OFF)
-option(OPT_SONARR   "Add the sonarr server"      OFF)
-option(OPT_QBT      "Add the qbittorrent client" ON )
-option(OPT_MYMPD    "Add myMPD server"           OFF)
-option(OPT_NGINX    "Add NginX as reverse proxy" ON )
+option(OPT_OPENRC       "Add OpenRC init script"  OFF)
+# servers
+option(OPT_PROWLARR     "Add prowlarr server"     ON )
+option(OPT_LIDARR       "Add lidarr server"       OFF)
+option(OPT_RADARR       "Add radarr server"       OFF)
+option(OPT_SONARR       "Add sonarr server"       OFF)
+
+option(OPT_QBITORRENT   "Add qbittorrent client"  OFF)
+option(OPT_TRANSMISSION "Add transmission client" OFF)
+
+option(OPT_MYMPD        "Add myMPD server"            OFF)
+option(OPT_NGINX        "Add NginX as reverse proxy"  OFF)
 
 set(OPENRC_DIR  sbin)    # OpenRC-run directory (/sbin)
 set(GEN_DIR generate)
@@ -62,12 +65,16 @@ function(add_service option name)
   endif()
 endfunction()
 
-add_service(${OPT_PROWLARR} prowlarr)
-add_service(${OPT_LIDARR}   lidarr)
-add_service(${OPT_RADARR}   radarr)
-add_service(${OPT_SONARR}   sonarr)
-add_service(${OPT_QBT}      qbittorrent)
-add_service(${OPT_MYMPD}    mympd)
+add_service(${OPT_PROWLARR}   prowlarr)
+add_service(${OPT_LIDARR}     lidarr)
+add_service(${OPT_RADARR}     radarr)
+add_service(${OPT_SONARR}     sonarr)
+add_service(${OPT_QBITORRENT}   qbittorrent)
+add_service(${OPT_TRANSMISSION} transmission)
+if (${OPT_TRANSMISSION})
+  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/transmission/watch)
+endif()
+add_service(${OPT_MYMPD}      mympd)
 if (${OPT_MYMPD})
   file(MAKE_DIRECTORY 
     ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/mympd/data

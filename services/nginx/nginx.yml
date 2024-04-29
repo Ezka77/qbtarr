@@ -20,3 +20,4 @@ services:
         read_only: true
     networks:
       - qbtarrnet
+      - dcsnet
