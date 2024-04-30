@@ -11,3 +11,7 @@ services:
       - ./data:/data
     networks:
       - qbtarrnet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.lidarr.rule=PathPrefix(`/lidarr`)"
+      - "traefik.http.routers.lidarr.entrypoints=http"

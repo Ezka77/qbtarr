@@ -19,3 +19,7 @@ services:
     restart: unless-stopped
     networks:
       - dcsnet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.mympd.rule=PathPrefix(`/`)"
+      - "traefik.http.routers.mympd.entrypoints=http"

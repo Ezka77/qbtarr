@@ -13,3 +13,7 @@ services:
       - ./data:/data
     networks:
       - qbtarrnet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.sonarr.rule=PathPrefix(`/sonarr`)"
+      - "traefik.http.routers.sonarr.entrypoints=http"

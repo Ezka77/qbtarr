@@ -1,0 +1,28 @@
+services:
+  traefik:
+    image: traefik:latest
+    container_name: traefik
+    env_file:
+      - srv.env
+    # environment:
+    #   - PUID=${PUID}
+    #   - PGID=${PGUID}
+    #   - UMASK=${UMASK}
+    #   - TZ=${TZ}
+    command:
+      - "--global.checknewversion=false"
+      - "--global.sendanonymoususage=false"
+      - "--log.level=INFO"
+      - "--entrypoints.http.address=:80"
+      - "--providers.docker=true"
+      - "--providers.docker.exposedbydefault=false"
+      - "--api.insecure=true"
+    ports:
+      - "80:80"
+      - "8000:8080"
+    volumes:
+      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+    restart: unless-stopped
+    networks:
+      - qbtarrnet
+      - dcsnet

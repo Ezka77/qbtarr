@@ -5,7 +5,7 @@ services:
     env_file:
       - srv.env
     # environment:
-    #   - TRANSMISSION_WEB_HOME= #optional
+    #   - TRANSMISSION_WEB_HOME=/transmission
     #   - USER= #optional
     #   - PASS= #optional
     #   - WHITELIST= #optional
@@ -22,3 +22,8 @@ services:
     restart: unless-stopped
     networks:
       - qbtarrnet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.transmission.rule=PathPrefix(`/transmission`)"
+      - "traefik.http.routers.transmission.entrypoints=http"
+      - "traefik.http.services.transmission.loadbalancer.server.port=9091"

@@ -14,3 +14,7 @@ services:
       - ./services/prowlarr/config:/config
     networks:
       - qbtarrnet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.prowlarr.rule=PathPrefix(`/prowlarr`)"
+      - "traefik.http.routers.prowlarr.entrypoints=http"

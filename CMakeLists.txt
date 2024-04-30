@@ -31,6 +31,7 @@ option(OPT_TRANSMISSION "Add transmission client" OFF)
 
 option(OPT_MYMPD        "Add myMPD server"            OFF)
 option(OPT_NGINX        "Add NginX as reverse proxy"  OFF)
+option(OPT_TRAEFIK      "Traefic reverse proxy"   OFF)
 
 set(OPENRC_DIR  sbin)    # OpenRC-run directory (/sbin)
 set(GEN_DIR generate)
@@ -82,6 +83,7 @@ if (${OPT_MYMPD})
   )
 endif()
 add_service(${OPT_NGINX} nginx)
+add_service(${OPT_TRAEFIK} traefic)
 
 ## Create the compose.yml with the list of included files
 set(INCLUDE_SERVICES "---")
