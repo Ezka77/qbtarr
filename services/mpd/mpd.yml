@@ -1,7 +1,7 @@
 services:
   mpd:
     image: qbtarr/mpd
-    build: ./services/mpd/lsio
+    build: ./services/mpd
     container_name: mpd
     restart: unless-stopped
     env_file:

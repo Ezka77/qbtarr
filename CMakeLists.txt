@@ -26,7 +26,7 @@ option(OPT_LIDARR       "Add lidarr server"       OFF)
 option(OPT_RADARR       "Add radarr server"       OFF)
 option(OPT_SONARR       "Add sonarr server"       OFF)
 
-option(OPT_QBITORRENT   "Add qbittorrent client"  OFF)
+option(OPT_QBITTORRENT  "Add qbittorrent client"  OFF)
 option(OPT_TRANSMISSION "Add transmission client" OFF)
 
 option(OPT_MPD          "Add MPD server"          OFF)
@@ -43,7 +43,7 @@ set(SRV_BIN_DIR ${CMAKE_BINARY_DIR}/${WORK_DIR}/services)
 
 # configure files
 if (${OPT_OPENRC})
-  configure_file(openrc/dcs.in ${DCS_DIR} @ONLY)
+  configure_file(openrc/dcs.in ${DCS_DIR}/dcs @ONLY)
   # create a dcs sub-service
   file(CREATE_LINK  dcs  ${CMAKE_BINARY_DIR}/${DCS_DIR}/dcs.${SVCNAME} SYMBOLIC)
 endif()
@@ -61,30 +61,31 @@ file(MAKE_DIRECTORY
 
 function(add_service name)
   string(TOUPPER OPT_${name} OPTNAME)
-  if (NOT ${${OPTNAME}})
+  if (NOT DEFINED ${OPTNAME})
+    message(WARNING "${OPTNAME} option is not defined!")
+    return()
+  elseif (NOT ${${OPTNAME}})
     return()
   endif()
 
-  if (${${OPTNAME}})
-    list(APPEND INCLUDE_LIST "\
+  list(APPEND INCLUDE_LIST "\
   - path: services/${name}/${name}.yml\n\
     project_directory: .")
-    set(INCLUDE_LIST ${INCLUDE_LIST} PARENT_SCOPE)
-    file(COPY services/${name} DESTINATION ${WORK_DIR}/services)
+  set(INCLUDE_LIST ${INCLUDE_LIST} PARENT_SCOPE)
+  file(COPY services/${name} DESTINATION ${WORK_DIR}/services)
 
-    set(options)
-    set(oneValueArgs)
-    set(multiValueArgs DIRECTORY)
-    cmake_parse_arguments(ADD_SERVICES "${options}" "${oneValueArgs}"
-      "${multiValueArgs}" ${ARGN})
+  set(options)
+  set(oneValueArgs)
+  set(multiValueArgs DIRECTORY)
+  cmake_parse_arguments(ADD_SERVICES "${options}" "${oneValueArgs}"
+    "${multiValueArgs}" ${ARGN})
 
-    if(DEFINED ADD_SERVICES_DIRECTORY)
-      list(TRANSFORM ADD_SERVICES_DIRECTORY PREPEND ${SRV_BIN_DIR}/${name}/)
-      file(MAKE_DIRECTORY ${ADD_SERVICES_DIRECTORY})
-    endif()
-
-    message(STATUS ${name})
+  if(DEFINED ADD_SERVICES_DIRECTORY)
+    list(TRANSFORM ADD_SERVICES_DIRECTORY PREPEND ${SRV_BIN_DIR}/${name}/)
+    file(MAKE_DIRECTORY ${ADD_SERVICES_DIRECTORY})
   endif()
+
+  message(STATUS ${name})
 endfunction()
 
 add_service(prowlarr)

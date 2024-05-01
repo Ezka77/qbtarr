@@ -10,7 +10,7 @@
     },
     {
       "name": "http-qbt",
-      "displayName": "servarr and qbittorrent",
+      "displayName": "servarr, qbittorrent and traefik",
       "description": "lidarr,prowlarr, sonarr, radarr and qbittorrent with traefik as reverse proxy",
       "inherits": "base",
       "cacheVariables": {
@@ -24,7 +24,7 @@
     },
     {
       "name": "http",
-      "displayName": "Servarr behind traefik",
+      "displayName": "servarr, transmission and traefik",
       "description": "lidarr, prowlarr, sonarr, radarr and transmission with traefik as reverse proxy",
       "inherits": "base",
       "cacheVariables": {
@@ -64,6 +64,7 @@
         "OPT_SONARR":   "ON",
         "OPT_OPENRC":   "ON",
         "OPT_NGINX":    "ON",
+        "OPT_MPD":      "ON",
         "OPT_MYMPD":    "ON",
         "OPT_QBITTORRENT":  "ON",
         "OPT_TRANSMISSION": "ON"
