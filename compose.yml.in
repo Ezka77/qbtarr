@@ -1,5 +1,13 @@
 @INCLUDE_SERVICES@
 
+volumes:
+  data:
+    driver: local
+    driver_opts:
+      type: none
+      device: "@DATA_DIRECTORY_PATH@"
+      o: bind
+
 networks:
   qbtarrnet:
     name: qbtarrnet

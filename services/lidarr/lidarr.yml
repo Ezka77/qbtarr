@@ -2,13 +2,14 @@ services:
   lidarr:
     container_name: lidarr
     image: ghcr.io/hotio/lidarr
+    restart: unless-stopped
     ports:
       - "8686:8686"
     env_file:
       - srv.env
     volumes:
       - ./services/lidarr/config:/config
-      - ./data:/data
+      - data:/data
     networks:
       - qbtarrnet
     labels:

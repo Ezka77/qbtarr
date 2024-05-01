@@ -10,7 +10,7 @@ services:
       - "7878:7878"
     volumes:
       - ./services/radarr/config:/config
-      - ./data:/data
+      - data:/data
     networks:
       - qbtarrnet
     labels:

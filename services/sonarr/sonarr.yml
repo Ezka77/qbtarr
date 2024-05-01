@@ -10,7 +10,7 @@ services:
       - "8989:8989"
     volumes:
       - ./services/sonarr/config:/config
-      - ./data:/data
+      - data:/data
     networks:
       - qbtarrnet
     labels:

@@ -14,7 +14,7 @@ services:
       - "6881:6881/udp"
     volumes:
       - ./services/qbittorrent/config:/config
-      - ./data:/data
+      - data:/data
     networks:
       - qbtarrnet
     labels:

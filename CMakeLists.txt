@@ -8,15 +8,17 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif()
 
 set(INSTALL_INIT etc/init.d)
-set(INSTALL_VAR var/lib/dcs)
+set(INSTALL_VAR var/lib)
 
 set(SVCNAME ${CMAKE_PROJECT_NAME})
 
+set(DATA_DIRECTORY_PATH ./data CACHE PATH "path to shared directory")
+
 # containers env 
-set(PUID 1000)
-set(PGID 1000)
-set(UMASK 002)
-set(TZ Europe/Paris)
+set(PUID 1000 CACHE STRING "uid")
+set(PGID 1000 CACHE STRING "gid")
+set(UMASK 002 CACHE STRING "umask")
+set(TZ Europe/Paris CACHE STRING "Time Zone")
 
 # Init scripts
 option(OPT_OPENRC       "Add OpenRC init script"  OFF)
@@ -49,7 +51,7 @@ if (${OPT_OPENRC})
 endif()
 
 # create includes to configure our docker-compose file and add optional services
-set(INCLUDE_LIST "# include of optional services\ninclude:")
+set(INCLUDE_LIST "# enabled services\ninclude:")
 
 # create shared directories
 file(MAKE_DIRECTORY 
@@ -67,19 +69,20 @@ function(add_service name)
   elseif (NOT ${${OPTNAME}})
     return()
   endif()
-
+  # and the service compose.yml string in our list
   list(APPEND INCLUDE_LIST "\
   - path: services/${name}/${name}.yml\n\
     project_directory: .")
   set(INCLUDE_LIST ${INCLUDE_LIST} PARENT_SCOPE)
+  # copy service directory
   file(COPY services/${name} DESTINATION ${WORK_DIR}/services)
-
+  # from function arguments parse everything
   set(options)
   set(oneValueArgs)
   set(multiValueArgs DIRECTORY)
   cmake_parse_arguments(ADD_SERVICES "${options}" "${oneValueArgs}"
     "${multiValueArgs}" ${ARGN})
-
+  # create any given sub-directory
   if(DEFINED ADD_SERVICES_DIRECTORY)
     list(TRANSFORM ADD_SERVICES_DIRECTORY PREPEND ${SRV_BIN_DIR}/${name}/)
     file(MAKE_DIRECTORY ${ADD_SERVICES_DIRECTORY})

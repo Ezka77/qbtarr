@@ -11,13 +11,13 @@ services:
       - "6600:6600"
     volumes:
       - ./services/mpd/config:/config
-      - ./data:/data:ro
+      - data:/data:ro
     devices:
      - /dev/snd
     networks:
       - dcsnet
-    healthcheck:
-      test: nc -nz -w3 127.0.0.1 6600 || exit 1
-      interval: 20s
-      timeout: 5s
-      retries: 3
+    # healthcheck:
+    #   test: nc -nz -w3 127.0.0.1 6600 || exit 1
+    #   interval: 20s
+    #   timeout: 5s
+    #   retries: 3

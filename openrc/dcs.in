@@ -1,4 +1,4 @@
-#!/@OPENRCDIR@/openrc-run
+#!/sbin/openrc-run
 
 depend(){
  need localmount docker
@@ -12,14 +12,14 @@ if [ "${SUBSVC}" = "dcs" ]; then
   eerror "${RC_SVCNAME} require a sub-service";
 fi
 
-DCS_DIR="${DCS_DIR:-@DCS_DIR@}"
+DCS_DIR="${DCS_DIR:-@INSTALL_VAR@}"
 DCS_FILE="${DCS_FILE:-compose.yml}"
 DCS_CFG="${DCS_DIR}/${SUBSVC}/${DCS_FILE}"
 
 command="${DOCKER_CMD:-/usr/bin/docker}"
-command_args="compose -f ${DCS_CFG} up"
-pidfile="/var/run/${RC_SVCNAME}.pid"
-command_background=true
+command_args="compose -f ${DCS_CFG} up --build --pull always --quiet-pull -d"
+#pidfile="/var/run/${RC_SVCNAME}.pid"
+command_background=false
 
 stop() {
   ebegin "Stopping docker compose ${SUBSVC}"
@@ -31,7 +31,7 @@ checkconfig(){
   "${command}" compose -f "${DCS_CFG}" config -q
 }
 
-# From documentatoin : https://github.com/OpenRC/openrc/blob/master/service-script-guide.md
+# docs : https://github.com/OpenRC/openrc/blob/master/service-script-guide.md
 start_pre() {
   # If this isn't a restart, make sure that the user's config isn't
   # busted before we try to start the daemon (this will produce
