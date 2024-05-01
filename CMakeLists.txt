@@ -21,7 +21,7 @@ set(TZ Europe/Paris)
 # Init scripts
 option(OPT_OPENRC       "Add OpenRC init script"  OFF)
 # servers
-option(OPT_PROWLARR     "Add prowlarr server"     ON )
+option(OPT_PROWLARR     "Add prowlarr server"     OFF)
 option(OPT_LIDARR       "Add lidarr server"       OFF)
 option(OPT_RADARR       "Add radarr server"       OFF)
 option(OPT_SONARR       "Add sonarr server"       OFF)
@@ -29,18 +29,21 @@ option(OPT_SONARR       "Add sonarr server"       OFF)
 option(OPT_QBITORRENT   "Add qbittorrent client"  OFF)
 option(OPT_TRANSMISSION "Add transmission client" OFF)
 
-option(OPT_MYMPD        "Add myMPD server"            OFF)
-option(OPT_NGINX        "Add NginX as reverse proxy"  OFF)
-option(OPT_TRAEFIK      "Traefic reverse proxy"   OFF)
+option(OPT_MPD          "Add MPD server"          OFF)
+option(OPT_MYMPD        "Add myMPD server"        OFF)
+option(OPT_TRAEFIK      "Traefik reverse proxy"   OFF)
+option(OPT_NGINX        "NginX as reverse proxy"  OFF)
 
 set(OPENRC_DIR  sbin)    # OpenRC-run directory (/sbin)
-set(GEN_DIR generate)
+set(GEN_DIR rootfs)
 set(DCS_DIR  ${GEN_DIR}/dcs)
 set(WORK_DIR ${GEN_DIR}/${SVCNAME})
 
+set(SRV_BIN_DIR ${CMAKE_BINARY_DIR}/${WORK_DIR}/services)
+
 # configure files
 if (${OPT_OPENRC})
-  configure_file(openrc/dcs.in ${DCS_DIR}/dcs @ONLY)
+  configure_file(openrc/dcs.in ${DCS_DIR} @ONLY)
   # create a dcs sub-service
   file(CREATE_LINK  dcs  ${CMAKE_BINARY_DIR}/${DCS_DIR}/dcs.${SVCNAME} SYMBOLIC)
 endif()
@@ -56,34 +59,44 @@ file(MAKE_DIRECTORY
   ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/movies
 )
 
-function(add_service option name)
-  if (${option})
+function(add_service name)
+  string(TOUPPER OPT_${name} OPTNAME)
+  if (NOT ${${OPTNAME}})
+    return()
+  endif()
+
+  if (${${OPTNAME}})
     list(APPEND INCLUDE_LIST "\
   - path: services/${name}/${name}.yml\n\
     project_directory: .")
     set(INCLUDE_LIST ${INCLUDE_LIST} PARENT_SCOPE)
     file(COPY services/${name} DESTINATION ${WORK_DIR}/services)
+
+    set(options)
+    set(oneValueArgs)
+    set(multiValueArgs DIRECTORY)
+    cmake_parse_arguments(ADD_SERVICES "${options}" "${oneValueArgs}"
+      "${multiValueArgs}" ${ARGN})
+
+    if(DEFINED ADD_SERVICES_DIRECTORY)
+      list(TRANSFORM ADD_SERVICES_DIRECTORY PREPEND ${SRV_BIN_DIR}/${name}/)
+      file(MAKE_DIRECTORY ${ADD_SERVICES_DIRECTORY})
+    endif()
+
+    message(STATUS ${name})
   endif()
 endfunction()
 
-add_service(${OPT_PROWLARR}   prowlarr)
-add_service(${OPT_LIDARR}     lidarr)
-add_service(${OPT_RADARR}     radarr)
-add_service(${OPT_SONARR}     sonarr)
-add_service(${OPT_QBITORRENT}   qbittorrent)
-add_service(${OPT_TRANSMISSION} transmission)
-if (${OPT_TRANSMISSION})
-  file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/transmission/watch)
-endif()
-add_service(${OPT_MYMPD}      mympd)
-if (${OPT_MYMPD})
-  file(MAKE_DIRECTORY 
-    ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/mympd/data
-    ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/mympd/cache
-  )
-endif()
-add_service(${OPT_NGINX} nginx)
-add_service(${OPT_TRAEFIK} traefic)
+add_service(prowlarr)
+add_service(lidarr)
+add_service(radarr)
+add_service(sonarr)
+add_service(qbittorrent)
+add_service(transmission DIRECTORY watch)
+add_service(mpd DIRECTORY config/playlists config/run)
+add_service(mympd DIRECTORY data cache)
+add_service(nginx)
+add_service(traefik)
 
 ## Create the compose.yml with the list of included files
 set(INCLUDE_SERVICES "---")
@@ -91,25 +104,26 @@ list(LENGTH INCLUDE_LIST NB_INCLUDES)
 if ( ${NB_INCLUDES} GREATER 1)
   # join strings to create a YAML list
   list(JOIN INCLUDE_LIST "\n" INCLUDE_SERVICES)
+else()
+  message(WARNING "No services enabled! Use `ccmake` or `cmake --preset <name>`")
 endif()
 
 configure_file(compose.yml.in ${WORK_DIR}/compose.yml @ONLY)
 configure_file(srv.env.in     ${WORK_DIR}/srv.env @ONLY)
 
-
 # Quick & Dirty custom targets
-# commands to start/stop containers with a target - shortcut to test our install
-add_custom_target(start
-  COMMAND docker compose up
+# commands to start/stop containers with a target - shortcut to test generated files
+add_custom_target(logs
+  COMMAND docker compose logs
   WORKING_DIRECTORY ${WORK_DIR}
-  COMMENT "start containers"
+  COMMENT "print containers logs"
   VERBATIM
 )
 
-add_custom_target(startd
+add_custom_target(start
   COMMAND docker compose up -d
   WORKING_DIRECTORY ${WORK_DIR}
-  COMMENT "start containers"
+  COMMENT "create, start and fork containers"
   VERBATIM
 )
 

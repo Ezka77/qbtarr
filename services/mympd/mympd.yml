@@ -2,8 +2,13 @@ services:
   mympd:
     image: ghcr.io/jcorporation/mympd/mympd:latest
     container_name: mympd
+    restart: unless-stopped
     # network_mode: "host"
     user: 1000:1000
+    # wait ... until mpd says we can go
+    depends_on:
+      mpd:
+        condition: service_healthy
     environment:
       - UMASK_SET=022
       - MYMPD_SSL=false
@@ -11,12 +16,11 @@ services:
     ports:
       - "8668:8668"
     volumes:
-      - /run/mpd/socket:/run/mpd/socket
-      - ./services/mympd/data:/var/lib/mympd/
-      - ./services/mympd/cache:/var/cache/mympd/
-      - /media/music:/music/:ro
-      - /var/lib/mpd/playlists:/playlists/:ro
-    restart: unless-stopped
+      - ./services/mympd/data:/var/lib/mympd
+      - ./services/mympd/cache:/var/cache/mympd
+      - ./data/music:/music:ro
+      - ./services/mpd/config/playlists:/playlists:ro
+      - ./services/mpd/config/run:/run/mpd
     networks:
       - dcsnet
     labels:

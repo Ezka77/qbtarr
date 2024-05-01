@@ -17,3 +17,8 @@ services:
       - ./data:/data
     networks:
       - qbtarrnet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.qbittorrent.entrypoints=http"
+      - "traefik.http.routers.qbittorrent.rule=PathPrefix(`/`)"
+      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"

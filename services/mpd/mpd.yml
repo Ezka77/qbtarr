@@ -1,0 +1,23 @@
+services:
+  mpd:
+    image: qbtarr/mpd
+    build: ./services/mpd/lsio
+    container_name: mpd
+    restart: unless-stopped
+    env_file:
+      - srv.env
+    ports:
+      - "8000:8000"
+      - "6600:6600"
+    volumes:
+      - ./services/mpd/config:/config
+      - ./data:/data:ro
+    devices:
+     - /dev/snd
+    networks:
+      - dcsnet
+    healthcheck:
+      test: nc -nz -w3 127.0.0.1 6600 || exit 1
+      interval: 20s
+      timeout: 5s
+      retries: 3

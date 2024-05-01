@@ -2,6 +2,7 @@ services:
   transmission:
     image: lscr.io/linuxserver/transmission:latest
     container_name: transmission
+    restart: unless-stopped
     env_file:
       - srv.env
     # environment:
@@ -14,12 +15,11 @@ services:
     volumes:
       - ./services/transmission/config:/config
       - ./services/transmission/watch:/watch
-      - /data/downloads:/downloads
+      - ./data/downloads:/downloads
     ports:
-      - 9091:9091
-      - 51413:51413
-      - 51413:51413/udp
-    restart: unless-stopped
+      - "9091:9091"
+      - "51413:51413"
+      - "51413:51413/udp"
     networks:
       - qbtarrnet
     labels:

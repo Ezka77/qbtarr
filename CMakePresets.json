@@ -2,51 +2,88 @@
   "version": 7,
   "configurePresets": [
     {
-      "name": "srvarr",
-      "displayName": "Default Config",
-      "description": "Generates docker configuration",
+      "name": "base",
+      "hidden": true,
+      "displayName": "base config",
+      "description": "define the binaryDir",
       "binaryDir": "${sourceDir}/build"
     },
     {
-      "name": "openrc",
-      "displayName": "Add OpenRC scripts",
-      "description": "Generates openrc scripts",
-      "inherits": "srvarr",
+      "name": "http-qbt",
+      "displayName": "servarr and qbittorrent",
+      "description": "lidarr,prowlarr, sonarr, radarr and qbittorrent with traefik as reverse proxy",
+      "inherits": "base",
       "cacheVariables": {
-        "OPENRC": "ON"
+        "OPT_PROWLARR": "ON",
+        "OPT_LIDARR":   "ON",
+        "OPT_RADARR":   "ON",
+        "OPT_SONARR":   "ON",
+        "OPT_TRAEFIK":  "ON",
+        "OPT_QBITTORRENT": "ON"
+      }
+    },
+    {
+      "name": "http",
+      "displayName": "Servarr behind traefik",
+      "description": "lidarr, prowlarr, sonarr, radarr and transmission with traefik as reverse proxy",
+      "inherits": "base",
+      "cacheVariables": {
+        "OPT_PROWLARR": "ON",
+        "OPT_LIDARR":   "ON",
+        "OPT_RADARR":   "ON",
+        "OPT_SONARR":   "ON",
+        "OPT_TRAEFIK":  "ON",
+        "OPT_TRANSMISSION": "ON"
+      }
+    },
+    {
+      "name": "mpd",
+      "displayName": "servarr, traefik, mympd and mpd",
+      "description": "lidarr, prowlarr, sonarr, radarr, transmission, traefik, mympd and mpd",
+      "inherits": "base",
+      "cacheVariables": {
+        "OPT_PROWLARR": "ON",
+        "OPT_LIDARR":   "ON",
+        "OPT_RADARR":   "ON",
+        "OPT_SONARR":   "ON",
+        "OPT_MYMPD":    "ON",
+        "OPT_TRAEFIK":  "ON",
+        "OPT_TRANSMISSION": "ON"
       }
     },
     {
       "name": "all",
-      "displayName": "All options to ON",
-      "description": "Generates everythings everywhere",
-      "inherits": "srvarr",
+      "hidden": true,
+      "displayName": "all on (not usable)",
+      "description": "for debug, generates everythings everywhere",
+      "inherits": "base",
       "cacheVariables": {
-        "OPT_OPENRC": "ON",
-        "OPT_NGINX": "ON",
-        "OPT_MYMPD": "ON",
-        "OPT_QBT": "ON",
-        "OPT_LIDARR": "ON",
         "OPT_PROWLARR": "ON",
-        "OPT_RADARR": "ON",
-        "OPT_SONARR": "ON"
+        "OPT_LIDARR":   "ON",
+        "OPT_RADARR":   "ON",
+        "OPT_SONARR":   "ON",
+        "OPT_OPENRC":   "ON",
+        "OPT_NGINX":    "ON",
+        "OPT_MYMPD":    "ON",
+        "OPT_QBITTORRENT":  "ON",
+        "OPT_TRANSMISSION": "ON"
       }
     }
   ],
   "buildPresets": [
     {
+      "name": "logs",
+      "configurePreset": "base",
+      "targets": [ "logs"]
+    },
+    {
       "name": "start",
-      "configurePreset": "all",
+      "configurePreset": "base",
       "targets": [ "start"]
     },
     {
-      "name": "startd",
-      "configurePreset": "all",
-      "targets": [ "startd"]
-    },
-    {
       "name": "stop",
-      "configurePreset": "all",
+      "configurePreset": "base",
       "targets": [ "stop"]
     }
   ]
