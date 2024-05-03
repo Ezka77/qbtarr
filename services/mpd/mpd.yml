@@ -1,7 +1,10 @@
 services:
   mpd:
-    image: qbtarr/mpd
-    build: ./services/mpd
+    image: qbtarr/mpd:alpine
+    build:
+      context: ./services/mpd
+      args:
+        MPD_VERSION: "0.23.15"
     container_name: mpd
     restart: unless-stopped
     env_file:
