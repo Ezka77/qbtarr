@@ -5,11 +5,13 @@ FROM alpine:edge as builder
 ARG MPD_VERSION
 ENV MPD_VERSION=$MPD_VERSION
 
-RUN apk add --no-cache build-base boost ninja boost-dev meson curl \
-       alsa-lib-dev sqlite-dev ffmpeg-dev opus-dev libogg-dev flac-dev libvorbis-dev
-RUN apk add --no-cache curl-dev
+RUN apk add --no-cache build-base boost ninja boost-dev meson \
+       alsa-lib-dev sqlite-dev ffmpeg-dev opus-dev libogg-dev flac-dev libvorbis-dev curl-dev
+
 RUN set -o pipefail && curl https://www.musicpd.org/download/mpd/${MPD_VERSION%.*}/mpd-${MPD_VERSION}.tar.xz | tar xJ
+
 WORKDIR mpd-${MPD_VERSION}
+
 RUN meson setup . output/release \
   --prefix=/usr \
   --sysconfdir=/etc \
