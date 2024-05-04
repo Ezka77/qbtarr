@@ -5,8 +5,8 @@ services:
     restart: unless-stopped
     # network_mode: "host"
     user: 1000:1000
-# IF one wants to use unix socket, enabled this one with the mpd healthcheck
-# to start the container only when mpd is ready
+    # IF one wants to use unix socket, enabled this one with the mpd healthcheck
+    # to start the container only when mpd is ready
     # depends_on:
     #   mpd:
     #     condition: service_healthy
@@ -21,9 +21,8 @@ services:
     volumes:
       - ./services/mympd/data:/var/lib/mympd
       - ./services/mympd/cache:/var/cache/mympd
-      - data:/data:ro
+      - music:/music:ro
       - ./services/mpd/config/playlists:/playlists:ro
-      # - ./services/mpd/config/run:/run/mpd
     networks:
       - dcsnet
     labels:

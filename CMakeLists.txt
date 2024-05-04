@@ -43,6 +43,13 @@ set(WORK_DIR ${GEN_DIR}/${SVCNAME})
 
 set(SRV_BIN_DIR ${CMAKE_BINARY_DIR}/${WORK_DIR}/services)
 
+configure_file(scripts/docker_compose_f.in scripts/dcf @ONLY)
+file(CHMOD ${CMAKE_BINARY_DIR}/scripts/dcf PERMISSIONS OWNER_EXECUTE GROUP_EXECUTE WORLD_EXECUTE)
+file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+file(CREATE_LINK ${CMAKE_BINARY_DIR}/scripts/dcf ${CMAKE_BINARY_DIR}/bin/start SYMBOLIC)
+file(CREATE_LINK ${CMAKE_BINARY_DIR}/scripts/dcf ${CMAKE_BINARY_DIR}/bin/stop SYMBOLIC)
+file(CREATE_LINK ${CMAKE_BINARY_DIR}/scripts/dcf ${CMAKE_BINARY_DIR}/bin/logs SYMBOLIC)
+
 # configure files
 if (${OPT_OPENRC})
   configure_file(openrc/dcs.in ${DCS_DIR}/dcs @ONLY)
@@ -69,7 +76,7 @@ function(add_service name)
   elseif (NOT ${${OPTNAME}})
     return()
   endif()
-  # and the service compose.yml string in our list
+  # add the service compose yml in our list
   list(APPEND INCLUDE_LIST "\
   - path: services/${name}/${name}.yml\n\
     project_directory: .")
@@ -87,7 +94,6 @@ function(add_service name)
     list(TRANSFORM ADD_SERVICES_DIRECTORY PREPEND ${SRV_BIN_DIR}/${name}/)
     file(MAKE_DIRECTORY ${ADD_SERVICES_DIRECTORY})
   endif()
-
   message(STATUS ${name})
 endfunction()
 
@@ -97,7 +103,7 @@ add_service(radarr)
 add_service(sonarr)
 add_service(qbittorrent)
 add_service(transmission DIRECTORY watch)
-add_service(mpd DIRECTORY config/playlists config/run)
+add_service(mpd DIRECTORY config/playlists)
 add_service(mympd DIRECTORY data cache)
 add_service(nginx)
 add_service(traefik)

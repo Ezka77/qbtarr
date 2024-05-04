@@ -6,7 +6,7 @@ ARG MPD_VERSION
 ENV MPD_VERSION=$MPD_VERSION
 
 RUN apk add --no-cache build-base boost ninja boost-dev meson curl
-RUN apk add --no-cache alsa-lib-dev sqlite-dev opus-dev libogg-dev flac-dev libvorbis-dev curl-dev faad2-dev libmad-dev
+RUN apk add --no-cache alsa-lib-dev sqlite-dev ffmpeg-dev opus-dev libogg-dev flac-dev libvorbis-dev curl-dev
 
 RUN set -o pipefail && curl https://www.musicpd.org/download/mpd/${MPD_VERSION:0:4}/mpd-${MPD_VERSION}.tar.xz | tar xJ
 
@@ -30,7 +30,7 @@ RUN meson setup . output/release \
   -Dsignalfd=true \
   -Dtcp=true \
   -Dalsa=enabled \
-  -Dffmpeg=disabled \
+  -Dffmpeg=enabled \
   -Dipv6=enabled \
   -Dsqlite=enabled \
   -Dsyslog=disabled \
@@ -50,7 +50,7 @@ RUN meson setup . output/release \
   -Dcurl=enabled \
   -Ddbus=disabled \
   -Dexpat=disabled \
-  -Dfaad=enabled \
+  -Dfaad=disabled \
   -Dflac=enabled \
   -Dfluidsynth=disabled \
   -Dgme=disabled \
@@ -62,7 +62,7 @@ RUN meson setup . output/release \
   -Dlame=disabled \
   -Dlibmpdclient=disabled \
   -Dlibsamplerate=disabled \
-  -Dmad=enabled \
+  -Dmad=disabled \
   -Dmikmod=disabled \
   -Dmms=disabled \
   -Dmodplug=disabled \
@@ -105,6 +105,6 @@ RUN ninja -C output/release
 
 FROM ghcr.io/linuxserver/baseimage-alpine:edge
 ARG MPD_VERSION
-RUN apk add --no-cache sqlite-libs alsa-lib alsa-utils faad2 opus libogg flac libvorbis curl libmad zlib libstdc++ libgcc
+RUN apk add --no-cache sqlite-libs alsa-lib alsa-utils ffmpeg opus libogg flac libvorbis curl zlib libstdc++ libgcc
 COPY --from=builder /mpd-${MPD_VERSION}/output/release/mpd /usr/bin/mpd
 CMD ["/usr/bin/mpd", "--no-daemon", "--stdout", "/config/mpd.conf"]

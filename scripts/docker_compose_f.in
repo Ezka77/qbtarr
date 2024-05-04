@@ -1,0 +1,16 @@
+#!/bin/bash
+
+SRV=$(basename $0)
+WORK_PATH=@CMAKE_BINARY_DIR@/@WORK_DIR@
+
+case ${SRV} in
+  start)
+    docker compose -f ${WORK_PATH}/compose.yml  up $@
+    ;;
+  stop)
+    docker compose -f ${WORK_PATH}/compose.yml down $@
+    ;;
+  logs)
+    docker compose -f ${WORK_PATH}/compose.yml logs $@
+    ;;
+esac

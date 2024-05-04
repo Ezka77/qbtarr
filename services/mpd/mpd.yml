@@ -14,7 +14,7 @@ services:
       - "6600:6600"
     volumes:
       - ./services/mpd/config:/config
-      - data:/data:ro
+      - music:/music:ro
     devices:
      - /dev/snd
     networks:

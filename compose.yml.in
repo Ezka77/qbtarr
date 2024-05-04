@@ -8,6 +8,20 @@ volumes:
       device: "@DATA_DIRECTORY_PATH@"
       o: bind
 
+  downloads:
+    driver: local
+    driver_opts:
+      type: none
+      device: "@DATA_DIRECTORY_PATH@/downloads"
+      o: bind
+
+  music:
+    driver: local
+    driver_opts:
+      type: none
+      device: "@DATA_DIRECTORY_PATH@/music"
+      o: bind
+
 networks:
   qbtarrnet:
     name: qbtarrnet
