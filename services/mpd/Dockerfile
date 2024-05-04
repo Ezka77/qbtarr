@@ -5,10 +5,10 @@ FROM alpine:edge as builder
 ARG MPD_VERSION
 ENV MPD_VERSION=$MPD_VERSION
 
-RUN apk add --no-cache build-base boost ninja boost-dev meson \
-       alsa-lib-dev sqlite-dev ffmpeg-dev opus-dev libogg-dev flac-dev libvorbis-dev curl-dev
+RUN apk add --no-cache build-base boost ninja boost-dev meson curl
+RUN apk add --no-cache alsa-lib-dev sqlite-dev opus-dev libogg-dev flac-dev libvorbis-dev curl-dev faad2-dev libmad-dev
 
-RUN set -o pipefail && curl https://www.musicpd.org/download/mpd/${MPD_VERSION%.*}/mpd-${MPD_VERSION}.tar.xz | tar xJ
+RUN set -o pipefail && curl https://www.musicpd.org/download/mpd/${MPD_VERSION:0:4}/mpd-${MPD_VERSION}.tar.xz | tar xJ
 
 WORKDIR mpd-${MPD_VERSION}
 
@@ -30,7 +30,7 @@ RUN meson setup . output/release \
   -Dsignalfd=true \
   -Dtcp=true \
   -Dalsa=enabled \
-  -Dffmpeg=enabled \
+  -Dffmpeg=disabled \
   -Dipv6=enabled \
   -Dsqlite=enabled \
   -Dsyslog=disabled \
@@ -50,7 +50,7 @@ RUN meson setup . output/release \
   -Dcurl=enabled \
   -Ddbus=disabled \
   -Dexpat=disabled \
-  -Dfaad=disabled \
+  -Dfaad=enabled \
   -Dflac=enabled \
   -Dfluidsynth=disabled \
   -Dgme=disabled \
@@ -62,7 +62,7 @@ RUN meson setup . output/release \
   -Dlame=disabled \
   -Dlibmpdclient=disabled \
   -Dlibsamplerate=disabled \
-  -Dmad=disabled \
+  -Dmad=enabled \
   -Dmikmod=disabled \
   -Dmms=disabled \
   -Dmodplug=disabled \
@@ -96,16 +96,15 @@ RUN meson setup . output/release \
   -Dwildmidi=disabled \
   -Dyajl=disabled \
   -Dzeroconf=disabled \
-  -Dzlib=disabled \
+  -Dzlib=enabled \
   -Dzzip=disabled
 
 RUN meson configure output/release
 RUN ninja -C output/release
 
 
-
 FROM ghcr.io/linuxserver/baseimage-alpine:edge
 ARG MPD_VERSION
-RUN apk add --no-cache sqlite-libs alsa-lib alsa-utils ffmpeg opus libogg flac libvorbis curl
+RUN apk add --no-cache sqlite-libs alsa-lib alsa-utils faad2 opus libogg flac libvorbis curl libmad zlib libstdc++ libgcc
 COPY --from=builder /mpd-${MPD_VERSION}/output/release/mpd /usr/bin/mpd
 CMD ["/usr/bin/mpd", "--no-daemon", "--stdout", "/config/mpd.conf"]
