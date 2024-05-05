@@ -6,7 +6,7 @@ ARG MPD_VERSION
 ENV MPD_VERSION=$MPD_VERSION
 
 RUN apk add --no-cache build-base boost ninja boost-dev meson curl
-RUN apk add --no-cache alsa-lib-dev sqlite-dev ffmpeg-dev opus-dev libogg-dev flac-dev libvorbis-dev curl-dev
+RUN apk add --no-cache alsa-lib-dev sqlite-dev ffmpeg-dev opus-dev libogg-dev flac-dev libvorbis-dev curl-dev liburing-dev
 
 RUN set -o pipefail && curl https://www.musicpd.org/download/mpd/${MPD_VERSION:0:4}/mpd-${MPD_VERSION}.tar.xz | tar xJ
 
@@ -105,6 +105,6 @@ RUN ninja -C output/release
 
 FROM ghcr.io/linuxserver/baseimage-alpine:edge
 ARG MPD_VERSION
-RUN apk add --no-cache sqlite-libs alsa-lib alsa-utils ffmpeg opus libogg flac libvorbis curl zlib libstdc++ libgcc
+RUN apk add --no-cache sqlite-libs alsa-lib alsa-utils ffmpeg opus libogg flac libvorbis curl zlib liburing
 COPY --from=builder /mpd-${MPD_VERSION}/output/release/mpd /usr/bin/mpd
 CMD ["/usr/bin/mpd", "--no-daemon", "--stdout", "/config/mpd.conf"]
