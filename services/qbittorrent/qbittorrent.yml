@@ -19,6 +19,16 @@ services:
       - qbtarrnet
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.qbittorrent.entrypoints=http"
-      - "traefik.http.routers.qbittorrent.rule=PathPrefix(`/`)"
-      - "traefik.http.services.qbittorrent.loadbalancer.server.port=8080"
+      - "traefik.http.routers.qb.entrypoints=http"
+      - "traefik.http.routers.qb.rule=PathPrefix(`/qb`)"
+      - "traefik.http.middlewares.qb_redirect.redirectregex.regex=^(.*)/qb$$"
+      - "traefik.http.middlewares.qb_redirect.redirectregex.replacement=$$1/qb/"
+      - "traefik.http.middlewares.qb_strip.stripprefix.prefixes=/qb/"
+      # appropriate header changes
+      - "traefik.http.middlewares.qb_headers.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
+      - "traefik.http.middlewares.qb_headers.headers.customrequestheaders.Referer="
+      - "traefik.http.middlewares.qb_headers.headers.customrequestheaders.Origin="
+      - "traefik.http.routers.qb.middlewares=qb_strip,qb_redirect,qb_headers"
+      # loadbalancer to *not* pass the host header
+      - "traefik.http.services.qb.loadbalancer.server.port=8080"
+      - "traefik.http.services.qb.loadbalancer.passhostheader=false"
