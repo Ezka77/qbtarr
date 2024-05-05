@@ -15,7 +15,7 @@ services:
       - MYMPD_SSL=false
       - MYMPD_HTTP_PORT=8668
       - MPD_HOST=mpd
-      - MPD_POSRT=6600
+      - MPD_PORT=6600
     ports:
       - "8668:8668"
     volumes:
@@ -27,5 +27,16 @@ services:
       - dcsnet
     labels:
       - "traefik.enable=true"
-      - "traefik.http.routers.mympd.rule=PathPrefix(`/`) || PathPrefix(`/api`)"
       - "traefik.http.routers.mympd.entrypoints=http"
+      - "traefik.http.routers.mympd.rule=PathPrefix(`/mympd`)"
+      - "traefik.http.middlewares.mympd_redirect.redirectregex.regex=^(.*)/mympd$$"
+      - "traefik.http.middlewares.mympd_redirect.redirectregex.replacement=$$1/mympd/"
+      - "traefik.http.middlewares.mympd_strip.stripprefix.prefixes=/mympd/"
+      # appropriate header changes
+      - "traefik.http.middlewares.mympd_headers.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
+      - "traefik.http.middlewares.mympd_headers.headers.customrequestheaders.Referer="
+      - "traefik.http.middlewares.mympd_headers.headers.customrequestheaders.Origin="
+      - "traefik.http.routers.mympd.middlewares=mympd_strip,mympd_redirect,mympd_headers"
+      # loadbalancer to *not* pass the host header
+      - "traefik.http.services.mympd.loadbalancer.server.port=8668"
+      - "traefik.http.services.mympd.loadbalancer.passhostheader=false"
