@@ -1,6 +1,7 @@
 cmake_minimum_required(VERSION 3.27)
 
-project(qbtarr VERSION 0.0.1)
+# no LANGUAGES ... I use cmake to generate configuration
+project(qbtarr VERSION 0.0.1 LANGUAGES)
 
 # For now: if install prefix is default-ed use /
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)

@@ -1,3 +1,5 @@
+name: qbtarr
+
 @INCLUDE_SERVICES@
 
 volumes:
