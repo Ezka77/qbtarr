@@ -19,7 +19,7 @@ You should have access to the servarr services and qbittorrent at:
 - http://localhost/sonarr
 - http://localhost/radarr
 - http://localhost/lidarr
-- http://localhost/qbt/
+- http://localhost/qb
 
 next step is to configure your services as required: it's a bare minimum docker-compose.yml file with some very basic configurations only provided to enable the access to all services.
 

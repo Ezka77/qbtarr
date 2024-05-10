@@ -21,24 +21,8 @@ set(PGID 1000 CACHE STRING "gid")
 set(UMASK 002 CACHE STRING "umask")
 set(TZ Europe/Paris CACHE STRING "Time Zone")
 
-# Init scripts
-option(OPT_OPENRC       "Add OpenRC init script"  OFF)
-# servers
-option(OPT_PROWLARR     "Add prowlarr server"     OFF)
-option(OPT_LIDARR       "Add lidarr server"       OFF)
-option(OPT_RADARR       "Add radarr server"       OFF)
-option(OPT_SONARR       "Add sonarr server"       OFF)
-
-option(OPT_QBITTORRENT  "Add qbittorrent client"  OFF)
-option(OPT_TRANSMISSION "Add transmission client" OFF)
-
-option(OPT_MPD          "Add MPD server"          OFF)
-option(OPT_MYMPD        "Add myMPD server"        OFF)
-option(OPT_TRAEFIK      "Traefik reverse proxy"   OFF)
-option(OPT_NGINX        "NginX as reverse proxy"  OFF)
-
 set(OPENRC_DIR  sbin)    # OpenRC-run directory (/sbin)
-set(GEN_DIR rootfs)
+set(GEN_DIR generated)
 set(DCS_DIR  ${GEN_DIR}/dcs)
 set(WORK_DIR ${GEN_DIR}/${SVCNAME})
 
@@ -76,12 +60,13 @@ file(MAKE_DIRECTORY
 
 function(add_service name)
   string(TOUPPER OPT_${name} OPTNAME)
-  if (NOT DEFINED ${OPTNAME})
-    message(WARNING "${OPTNAME} option is not defined!")
-    return()
-  elseif (NOT ${${OPTNAME}})
+
+  option(${OPTNAME} "enable service ${name}" OFF)
+
+  if (NOT ${${OPTNAME}})
     return()
   endif()
+
   # add the service compose yml in our list
   list(APPEND INCLUDE_LIST "\
   - path: services/${name}/${name}.yml\n\
@@ -125,7 +110,7 @@ else()
 endif()
 
 configure_file(compose.yml.in ${WORK_DIR}/compose.yml @ONLY)
-configure_file(srv.env.in     ${WORK_DIR}/srv.env @ONLY)
+configure_file(srv.env.in     ${WORK_DIR}/srv.env     @ONLY)
 
 # Quick & Dirty custom targets
 # commands to start/stop containers with a target - shortcut to test generated files
