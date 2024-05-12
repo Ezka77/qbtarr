@@ -86,6 +86,18 @@ function(add_service name)
     file(MAKE_DIRECTORY ${ADD_SERVICES_DIRECTORY})
   endif()
   message(STATUS ${name})
+
+  # on install do not overwrite if a service already exist ; installation = copy the service directory to the destination
+  set(SERVICE_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/${INSTALL_VAR}/${SVCNAME}/services)
+  install(CODE "
+  if(NOT EXISTS ${SERVICE_INSTALL_PATH}/${name})
+      file(INSTALL ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/${name}
+        DESTINATION ${SERVICE_INSTALL_PATH}
+        USE_SOURCE_PERMISSIONS)
+    else()
+      message(STATUS  \"${name} not installed: this service already exist at destination.\")
+    endif()"
+  )
 endfunction()
 
 add_service(prowlarr)
@@ -109,8 +121,16 @@ else()
   message(WARNING "No services enabled! Use `ccmake` or `cmake --preset <name>`")
 endif()
 
+# common generated files
 configure_file(compose.yml.in ${WORK_DIR}/compose.yml @ONLY)
 configure_file(srv.env.in     ${WORK_DIR}/srv.env     @ONLY)
+
+# install the files in var/lib/qbtarr
+install(FILES 
+  ${CMAKE_BINARY_DIR}/${WORK_DIR}/compose.yml
+  ${CMAKE_BINARY_DIR}/${WORK_DIR}/srv.env
+  DESTINATION ${INSTALL_VAR}/${SVCNAME}
+  )
 
 # Quick & Dirty custom targets
 # commands to start/stop containers with a target - shortcut to test generated files
@@ -136,19 +156,3 @@ add_custom_target(stop
   VERBATIM
 )
 
-# Install the generated files in var/lib/dcs
-install(DIRECTORY 
-  ${CMAKE_BINARY_DIR}/${WORK_DIR}
-  DESTINATION ${INSTALL_VAR}
-  USE_SOURCE_PERMISSIONS
-  COMPONENT ${CMAKE_PROJECT_NAME}
-)
-# TODO: need to change UID:GID of ${WORK_DIR_N}/* directories
-
-# Theses ones can stay as root:root
-install(FILES
-  ${CMAKE_BINARY_DIR}/${DCS_DIR}/dcs
-  ${CMAKE_BINARY_DIR}/${DCS_DIR}/dcs.${SVCNAME}
-  DESTINATION ${INSTALL_INIT}
-  CONFIGURATIONS WithOpenRC
-)
