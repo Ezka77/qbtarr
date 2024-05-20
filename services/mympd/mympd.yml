@@ -31,7 +31,7 @@ services:
       - "traefik.http.routers.mympd.rule=PathPrefix(`/mympd`)"
       - "traefik.http.middlewares.mympd_redirect.redirectregex.regex=^(.*)/mympd$$"
       - "traefik.http.middlewares.mympd_redirect.redirectregex.replacement=$$1/mympd/"
-      - "traefik.http.middlewares.mympd_strip.stripprefix.prefixes=/mympd/"
+      - "traefik.http.middlewares.mympd_strip.stripprefix.prefixes=/mympd"
       # appropriate header changes
       - "traefik.http.middlewares.mympd_headers.headers.customrequestheaders.X-Frame-Options=SAMEORIGIN"
       - "traefik.http.middlewares.mympd_headers.headers.customrequestheaders.Referer="

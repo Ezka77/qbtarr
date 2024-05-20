@@ -110,6 +110,7 @@ add_service(mpd DIRECTORY config/playlists)
 add_service(mympd DIRECTORY data cache)
 add_service(nginx)
 add_service(traefik)
+add_service(plex DIRECTORY config transcode)
 
 ## Create the compose.yml with the list of included files
 set(INCLUDE_SERVICES "---")
