@@ -24,6 +24,20 @@ volumes:
       device: "@DATA_DIRECTORY_PATH@/music"
       o: bind
 
+  series:
+    driver: local
+    driver_opts:
+      type: none
+      device: "@DATA_DIRECTORY_PATH@/series"
+      o: bind
+
+  movies:
+    driver: local
+    driver_opts:
+      type: none
+      device: "@DATA_DIRECTORY_PATH@/movies"
+      o: bind
+
 networks:
   qbtarrnet:
     name: qbtarrnet

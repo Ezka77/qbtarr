@@ -1,0 +1,26 @@
+---
+services:
+  jellyfin:
+    image: lscr.io/linuxserver/jellyfin:latest
+    container_name: jellyfin
+    env_file:
+      - srv.env
+    environment:
+      - LOG_LEVEL=debug
+      - JELLYFIN_PublishedServerUrl=192.168.8.100 #optional
+    volumes:
+      - ./services/jellyfin/config:/config
+      - data:/data
+    ports:
+      - 8096:8096
+      # - 8920:8920 #optional https
+      - 7359:7359/udp #optional autodiscover
+      - 1900:1900/udp #optional dlna
+    devices:
+      - /dev/dri:/dev/dri
+    restart: unless-stopped
+    group_add: # by id as these may not exist within the container. Needed to provide permissions to the VAAPI Devices
+      - '107' #render
+      - '44' #video
+    networks:
+      - qbtarrnet
