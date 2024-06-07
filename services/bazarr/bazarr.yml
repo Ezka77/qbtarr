@@ -1,0 +1,20 @@
+---
+services:
+  bazarr:
+    image: lscr.io/linuxserver/bazarr:latest
+    container_name: bazarr
+    env_file:
+      - srv.env
+    volumes:
+      - ./services/bazarr/config:/config
+      - movies:/movies #optional
+      - series:/tv #optional
+    ports:
+      - 6767:6767
+    restart: unless-stopped
+    networks:
+      - qbtarrnet
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.bazarr.rule=PathPrefix(`/bazarr`)"
+      - "traefik.http.routers.bazarr.entrypoints=http"

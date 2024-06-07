@@ -112,6 +112,7 @@ add_service(nginx)
 add_service(traefik)
 add_service(jellyfin DIRECTORY config)
 add_service(jellyseerr DIRECTORY config)
+add_service(bazarr DIRECTORY config)
 
 ## Create the compose.yml with the list of included files
 set(INCLUDE_SERVICES "---")
