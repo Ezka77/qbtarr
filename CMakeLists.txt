@@ -8,11 +8,10 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "/" CACHE PATH "..." FORCE)
 endif()
 
-set(INSTALL_INIT etc/init.d)
+# Add cmake dir to module path
+list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+
 set(INSTALL_VAR var/lib)
-
-set(SVCNAME ${CMAKE_PROJECT_NAME})
-
 set(DATA_DIRECTORY_PATH ./data CACHE PATH "path to shared directory")
 
 # containers env 
@@ -21,12 +20,7 @@ set(PGID 1000 CACHE STRING "gid")
 set(UMASK 002 CACHE STRING "umask")
 set(TZ Europe/Paris CACHE STRING "Time Zone")
 
-set(OPENRC_DIR  sbin)    # OpenRC-run directory (/sbin)
 set(GEN_DIR generated)
-set(DCS_DIR  ${GEN_DIR}/dcs)
-set(WORK_DIR ${GEN_DIR}/${SVCNAME})
-
-set(SRV_BIN_DIR ${CMAKE_BINARY_DIR}/${WORK_DIR}/services)
 
 configure_file(scripts/docker_compose_f.in scripts/dcf @ONLY)
 file(CHMOD ${CMAKE_BINARY_DIR}/scripts/dcf 
@@ -40,66 +34,14 @@ file(CREATE_LINK ${CMAKE_BINARY_DIR}/scripts/dcf ${CMAKE_BINARY_DIR}/bin/start S
 file(CREATE_LINK ${CMAKE_BINARY_DIR}/scripts/dcf ${CMAKE_BINARY_DIR}/bin/stop SYMBOLIC)
 file(CREATE_LINK ${CMAKE_BINARY_DIR}/scripts/dcf ${CMAKE_BINARY_DIR}/bin/logs SYMBOLIC)
 
-# configure files
-if (${OPT_OPENRC})
-  configure_file(openrc/dcs.in ${DCS_DIR}/dcs @ONLY)
-  # create a dcs sub-service
-  file(CREATE_LINK  dcs  ${CMAKE_BINARY_DIR}/${DCS_DIR}/dcs.${SVCNAME} SYMBOLIC)
-endif()
+include(AddService)
+# configure
+set_service_workdir(${GEN_DIR}/${CMAKE_PROJECT_NAME})
 
-# create includes to configure our docker-compose file and add optional services
-set(INCLUDE_LIST "# enabled services\ninclude:")
+# add default data directories
+add_data()
 
-# create shared directories
-file(MAKE_DIRECTORY 
-  ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/downloads
-  ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/music
-  ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/series
-  ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/movies
-)
-
-function(add_service name)
-  string(TOUPPER OPT_${name} OPTNAME)
-
-  option(${OPTNAME} "enable service ${name}" OFF)
-
-  if (NOT ${${OPTNAME}})
-    return()
-  endif()
-
-  # add the service compose yml in our list
-  list(APPEND INCLUDE_LIST "\
-  - path: services/${name}/${name}.yml\n\
-    project_directory: .")
-  set(INCLUDE_LIST ${INCLUDE_LIST} PARENT_SCOPE)
-  # copy service directory
-  file(COPY services/${name} DESTINATION ${WORK_DIR}/services)
-  # from function arguments parse everything
-  set(options)
-  set(oneValueArgs)
-  set(multiValueArgs DIRECTORY)
-  cmake_parse_arguments(ADD_SERVICES "${options}" "${oneValueArgs}"
-    "${multiValueArgs}" ${ARGN})
-  # create any given sub-directory
-  if(DEFINED ADD_SERVICES_DIRECTORY)
-    list(TRANSFORM ADD_SERVICES_DIRECTORY PREPEND ${SRV_BIN_DIR}/${name}/)
-    file(MAKE_DIRECTORY ${ADD_SERVICES_DIRECTORY})
-  endif()
-  message(STATUS ${name})
-
-  # on install do not overwrite if a service already exist ; installation = copy the service directory to the destination
-  set(SERVICE_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/${INSTALL_VAR}/${SVCNAME}/services)
-  install(CODE "
-  if(NOT EXISTS ${SERVICE_INSTALL_PATH}/${name})
-      file(INSTALL ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/${name}
-        DESTINATION ${SERVICE_INSTALL_PATH}
-        USE_SOURCE_PERMISSIONS)
-    else()
-      message(STATUS  \"${name} not installed: this service already exist at destination.\")
-    endif()"
-  )
-endfunction()
-
+# our services
 add_service(prowlarr)
 add_service(lidarr)
 add_service(radarr)
@@ -114,48 +56,5 @@ add_service(jellyfin DIRECTORY config)
 add_service(jellyseerr DIRECTORY config)
 add_service(bazarr DIRECTORY config)
 
-## Create the compose.yml with the list of included files
-set(INCLUDE_SERVICES "---")
-list(LENGTH INCLUDE_LIST NB_INCLUDES)
-if ( ${NB_INCLUDES} GREATER 1)
-  # join strings to create a YAML list
-  list(JOIN INCLUDE_LIST "\n" INCLUDE_SERVICES)
-else()
-  message(WARNING "No services enabled! Use `ccmake` or `cmake --preset <name>`")
-endif()
-
-# common generated files
-configure_file(compose.yml.in ${WORK_DIR}/compose.yml @ONLY)
-configure_file(srv.env.in     ${WORK_DIR}/srv.env     @ONLY)
-
-# install the files in var/lib/qbtarr
-install(FILES 
-  ${CMAKE_BINARY_DIR}/${WORK_DIR}/compose.yml
-  ${CMAKE_BINARY_DIR}/${WORK_DIR}/srv.env
-  DESTINATION ${INSTALL_VAR}/${SVCNAME}
-  )
-
-# Quick & Dirty custom targets
-# commands to start/stop containers with a target - shortcut to test generated files
-add_custom_target(logs
-  COMMAND docker compose logs
-  WORKING_DIRECTORY ${WORK_DIR}
-  COMMENT "print containers logs"
-  VERBATIM
-)
-
-add_custom_target(start
-  COMMAND docker compose up -d
-  WORKING_DIRECTORY ${WORK_DIR}
-  COMMENT "create, start and fork containers"
-  VERBATIM
-)
-
-# cmake --build build/ --target start
-add_custom_target(stop
-  COMMAND docker compose down
-  WORKING_DIRECTORY ${WORK_DIR}
-  COMMENT "stop containers"
-  VERBATIM
-)
-
+# and in the end create the compose file
+add_compose_and_env()

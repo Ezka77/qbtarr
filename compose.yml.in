@@ -1,6 +1,6 @@
 name: qbtarr
 
-@INCLUDE_SERVICES@
+@YML_SERVICES@
 
 volumes:
   data:
