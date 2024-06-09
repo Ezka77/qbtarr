@@ -5,11 +5,6 @@ services:
     restart: unless-stopped
     env_file:
       - srv.env
-    # environment:
-    #   - PUID=${PUID}
-    #   - PGID=${PGUID}
-    #   - UMASK=${UMASK}
-    #   - TZ=${TZ}
     command:
       - "--global.checknewversion=false"
       - "--global.sendanonymoususage=false"

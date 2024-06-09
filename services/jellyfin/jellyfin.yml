@@ -5,9 +5,9 @@ services:
     container_name: jellyfin
     env_file:
       - srv.env
-    environment:
-      - LOG_LEVEL=debug
-      - JELLYFIN_PublishedServerUrl=192.168.8.100 #optional
+    # environment:
+    #   - LOG_LEVEL=debug
+    #   - JELLYFIN_PublishedServerUrl= #optional
     volumes:
       - ./services/jellyfin/config:/config
       - data:/data
@@ -24,3 +24,23 @@ services:
       - '44' #video
     networks:
       - qbtarrnet
+    labels:
+      ## from jellyfin ... but no ssl /!\ --> be sure to disable ipv6
+      - "traefik.enable=true"
+      - "traefik.http.routers.jellyfin.entrypoints=http"
+      - "traefik.http.routers.jellyfin.rule=PathPrefix(`/jellyfin`)"
+      ## Middleware
+      - "traefik.http.routers.jellyfin.middlewares=jellyfin-mw"
+      #### The customResponseHeaders option lists the Header names and values to apply to the response.
+      - "traefik.http.middlewares.jellyfin-mw.headers.customResponseHeaders.X-Robots-Tag=noindex,nofollow,nosnippet,noarchive,notranslate,noimageindex"
+      #### Set frameDeny to true to add the X-Frame-Options header with the value of DENY.
+      - "traefik.http.middlewares.jellyfin-mw.headers.frameDeny=true"
+      #### Set contentTypeNosniff to true to add the X-Content-Type-Options header with the value nosniff.
+      - "traefik.http.middlewares.jellyfin-mw.headers.contentTypeNosniff=true"
+      #### Set browserXssFilter to true to add the X-XSS-Protection header with the value 1; mode=block.
+      - "traefik.http.middlewares.jellyfin-mw.headers.browserXSSFilter=true"
+      ## HTTP Service
+      # We define the port here as a port is required
+      - "traefik.http.routers.jellyfin.service=jellyfin-svc"
+      - "traefik.http.services.jellyfin-svc.loadBalancer.server.port=8096"
+      - "traefik.http.services.jellyfin-svc.loadBalancer.passHostHeader=true"

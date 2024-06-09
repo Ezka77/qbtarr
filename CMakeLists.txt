@@ -14,7 +14,7 @@ list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 set(INSTALL_VAR var/lib)
 set(DATA_DIRECTORY_PATH ./data CACHE PATH "path to shared directory")
 
-# containers env 
+# containers env -- configured from ccmake
 set(PUID 1000 CACHE STRING "uid")
 set(PGID 1000 CACHE STRING "gid")
 set(UMASK 002 CACHE STRING "umask")
@@ -25,12 +25,10 @@ set(GEN_DIR generated)
 include(AddService)
 include(AddDcfCommand)
 
-add_dcf()
-
 # configure
 set_service_workdir(${GEN_DIR}/${CMAKE_PROJECT_NAME})
 
-# add default data directories (for tests)
+# add default data directories (for tests) -- target ?
 add_data()
 
 # services
@@ -48,5 +46,9 @@ add_service(jellyfin DIRECTORY config)
 add_service(jellyseerr DIRECTORY config)
 add_service(bazarr DIRECTORY config)
 
-# and in the end create the compose file
+# and in the end create the compose file -- TODO: add a target instead ?
 add_compose()
+
+# ugly shortcut scripts
+add_dcf()
+
