@@ -69,7 +69,7 @@ function(add_service name)
   )
 endfunction()
 
-function(add_compose_and_env)
+function(add_compose)
   ## Create the compose.yml with the list of included files
   set(YML_SERVICES "---")
   list(LENGTH INCLUDE_LIST NB_INCLUDES)

@@ -8,7 +8,7 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
   set(CMAKE_INSTALL_PREFIX "/" CACHE PATH "..." FORCE)
 endif()
 
-# Add cmake dir to module path
+# Add source cmake dir to module path
 list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 set(INSTALL_VAR var/lib)
@@ -22,26 +22,18 @@ set(TZ Europe/Paris CACHE STRING "Time Zone")
 
 set(GEN_DIR generated)
 
-configure_file(scripts/docker_compose_f.in scripts/dcf @ONLY)
-file(CHMOD ${CMAKE_BINARY_DIR}/scripts/dcf 
-  PERMISSIONS 
-  OWNER_READ OWNER_WRITE OWNER_EXECUTE 
-  GROUP_READ GROUP_EXECUTE 
-  WORLD_READ WORLD_EXECUTE
-)
-file(MAKE_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-file(CREATE_LINK ${CMAKE_BINARY_DIR}/scripts/dcf ${CMAKE_BINARY_DIR}/bin/start SYMBOLIC)
-file(CREATE_LINK ${CMAKE_BINARY_DIR}/scripts/dcf ${CMAKE_BINARY_DIR}/bin/stop SYMBOLIC)
-file(CREATE_LINK ${CMAKE_BINARY_DIR}/scripts/dcf ${CMAKE_BINARY_DIR}/bin/logs SYMBOLIC)
-
 include(AddService)
+include(AddDcfCommand)
+
+add_dcf()
+
 # configure
 set_service_workdir(${GEN_DIR}/${CMAKE_PROJECT_NAME})
 
-# add default data directories
+# add default data directories (for tests)
 add_data()
 
-# our services
+# services
 add_service(prowlarr)
 add_service(lidarr)
 add_service(radarr)
@@ -57,4 +49,4 @@ add_service(jellyseerr DIRECTORY config)
 add_service(bazarr DIRECTORY config)
 
 # and in the end create the compose file
-add_compose_and_env()
+add_compose()
