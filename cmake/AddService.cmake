@@ -58,6 +58,7 @@ function(add_service name)
 
   # on install do not overwrite if a service already exist ; installation = copy the service directory to the destination
   set(SERVICE_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/${INSTALL_VAR}/${CMAKE_PROJECT_NAME}/services)
+  cmake_path(ABSOLUTE_PATH SERVICE_INSTALL_PATH NORMALIZE OUTPUT_VARIABLE SERVICE_INSTALL_PATH)
   install(CODE "
   if(NOT EXISTS ${SERVICE_INSTALL_PATH}/${name})
       file(INSTALL ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/${name}
@@ -88,6 +89,6 @@ function(add_compose)
   install(FILES 
     ${CMAKE_BINARY_DIR}/${WORK_DIR}/compose.yml
     ${CMAKE_BINARY_DIR}/${WORK_DIR}/srv.env
-    DESTINATION ${INSTALL_VAR}/${SVCNAME}
+    DESTINATION ${INSTALL_VAR}/${CMAKE_PROJECT_NAME}
     )
 endfunction()
