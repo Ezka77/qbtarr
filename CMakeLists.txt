@@ -42,7 +42,7 @@ add_service(mpd DIRECTORY config/playlists)
 add_service(mympd DIRECTORY data cache)
 add_service(nginx)
 add_service(traefik)
-add_service(jellyfin DIRECTORY config)
+add_service(jellyfin)
 add_service(jellyseerr DIRECTORY config)
 add_service(bazarr DIRECTORY config)
 
