@@ -5,6 +5,8 @@ services:
     restart: unless-stopped
     env_file:
       - srv.env
+    # TODO: make it configurable with cmake
+    user: 1000:1000
     # environment:
     #   - LOG_LEVEL=debug
     ports:
@@ -13,37 +15,3 @@ services:
       - ./services/jellyseerr/config:/app/config
     networks:
       - qbtarrnet
-    labels:
-      - "traefik.http.routers.jellyseer.rule=PathPrefix(`/jellyseer`)"
-      - "traefik.http.middlewares.jellyseerr-stripprefix.stripprefix.prefixes=/jellyseerr"
-      - "traefik.http.middlewares.jellyseerr-rewriterelativelocation.plugin.traefik-plugin-rewrite-response-headers.rewrites.header=Location"
-      - "traefik.http.middlewares.jellyseerr-rewriterelativelocation.plugin.traefik-plugin-rewrite-response-headers.rewrites.regex=^/(.+)$"
-      - "traefik.http.middlewares.jellyseerr-rewriterelativelocation.plugin.traefik-plugin-rewrite-response-headers.rewrites.replacement=/jellyseerr/$1"
-
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[0].regex=href=\"/(.+?)?\""
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[0].replacement=href=\"/jellyseerr/$1\""
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[1].regex=src=\"/(.+?)?\""
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[1].replacement=src=\"/jellyseerr/$1\""
-
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[2].regex=href:\"/(.*?)\""
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[2].replacement=href:\"/jellyseerr/$1\""
-
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[3].regex=\"/api/(.*?)\""
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[3].replacement=\"/jellyseerr/api/$1\""
-
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[4].regex=\"/_next/(.*?)\""
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[4].replacement=\"/jellyseerr/_next/$1\""
-
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[5].regex=\"/images/(.*?)\""
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[5].replacement=\"/jellyseerr/images/$1\""
-
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[6].regex=src:\"/(.*?)\""
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[6].replacement=src:\"/jellyseerr/$1\""
-
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[7].regex=linkUrl:\"/(.*?)\""
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.rewrites[7].replacement=linkUrl:\"/jellyseerr/$1\""
-
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.lastModified=true"
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.monitoring.types[0]=text/html"
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.monitoring.types[1]=application/javascript" 
-      - "traefik.http.middlewares.jellyseerr-rewritebody.plugin.rewrite-body.monitoring.types[2]=*/*" 
