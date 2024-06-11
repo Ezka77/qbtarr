@@ -21,7 +21,7 @@ ccmake build
 ```
 
 I would advise to start with Traefik, Prowlarr and QBittorrent. Make everything work together and then start adding the other services.
-You can add as much servarr as wanted by running `ccmake` and switch them to `ON` and repeat the previous command.
+You can add as much servarr as wanted by running `ccmake` and switch them to `ON` and repeat the next install command.
 When a service switch is `OFF` then the service entry is removed from the main `compose.yml`, the service directory is NOT deleted.
 
 ## Installation
@@ -36,7 +36,7 @@ To change the default install path, use `ccmake` and edit the `CMAKE_INSTALL_PRE
 
 ## Configuration
 
-Next start the services from the build directory and start configuring.
+Next start the services from the install directory:
 ```
 cd /var/lib/qbtarr
 docker compose up -d
@@ -53,11 +53,13 @@ Eventually you should have access to the configured services to theses adresses:
 - http://localhost/jellyfin
 - jellyseerr: http://localhost:5055
 
-Next step is to configure your services as required (see https://wiki.servarr.com/)
-It's a bare minimum docker compose file with some very basic configurations only provided to enable the access to all services from their subpath.
+Next is to configure your services as required (see https://wiki.servarr.com/)
 
-For exemple your first step should be to configure Prowlarr with some indexers, next add sonarr, radarr and lidarr to prowlarr.
-Each container can acces to the other ones by using dns names:
+
+### First step
+
+You should configure Prowlarr with some indexers, next add sonarr, radarr and lidarr to prowlarr.
+Each container can access to the other ones by using dns names:
 
 - prowlarr: `http://prowlarr:9696/prowlarr`
 - sonarr: `http://sonarr:8989/sonarr`
