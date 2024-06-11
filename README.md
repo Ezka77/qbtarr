@@ -10,12 +10,20 @@ The idea is to generate a `compose.yml` file for `docker compose` with the servi
 
 ## How to use
 
-Create the `build` directory:
+Clone this git and move in the directory
+```
+git clone https://github.com/Ezka77/qbtarr.git
+cd qbtarr
+```
+
+### The eazy way
+
+Create the `build` directory and generate the base configuration and directories layout:
 ```
 cmake -B build
 ```
 
-Enable the service by using ccmake for exemple (or any cmake-gui tool):
+Personnalize your services by enabling them with ccmake for exemple (or any cmake-gui tool):
 ```
 ccmake build
 ```
@@ -23,6 +31,13 @@ ccmake build
 I would advise to start with Traefik, Prowlarr and QBittorrent. Make everything work together and then start adding the other services.
 You can add as much servarr as wanted by running `ccmake` and switch them to `ON` and repeat the next install command.
 When a service switch is `OFF` then the service entry is removed from the main `compose.yml`, the service directory is NOT deleted.
+
+###  The lazy way -- if not using the eazy way above
+
+Assume you don't understand anything above (or for any other reason) and you want to start the next step asap
+```
+cmake --preset default
+```
 
 ## Installation
 
@@ -34,7 +49,7 @@ make install
 
 To change the default install path, use `ccmake` and edit the `CMAKE_INSTALL_PREFIX` value.
 
-## Configuration
+## Servarr'n'Jelly Configuration
 
 Next start the services from the install directory:
 ```
