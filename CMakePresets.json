@@ -9,83 +9,21 @@
       "binaryDir": "${sourceDir}/build"
     },
     {
-      "name": "http-qbt",
+      "name": "default",
       "displayName": "servarr, qbittorrent and traefik",
-      "description": "lidarr,prowlarr, sonarr, radarr and qbittorrent with traefik as reverse proxy",
+      "description": "servarrs, qbittorrent and some jelly with traefik as reverse proxy",
       "inherits": "base",
       "cacheVariables": {
-        "OPT_PROWLARR": "ON",
-        "OPT_LIDARR":   "ON",
-        "OPT_RADARR":   "ON",
-        "OPT_SONARR":   "ON",
         "OPT_TRAEFIK":  "ON",
-        "OPT_QBITTORRENT": "ON"
-      }
-    },
-    {
-      "name": "http",
-      "displayName": "servarr, transmission and traefik",
-      "description": "lidarr, prowlarr, sonarr, radarr and transmission with traefik as reverse proxy",
-      "inherits": "base",
-      "cacheVariables": {
         "OPT_PROWLARR": "ON",
         "OPT_LIDARR":   "ON",
         "OPT_RADARR":   "ON",
         "OPT_SONARR":   "ON",
-        "OPT_TRAEFIK":  "ON",
-        "OPT_TRANSMISSION": "ON"
+        "OPT_BAZARR":   "ON",
+        "OPT_QBITTORRENT": "ON",
+        "OPT_JELLYFIN": "ON",
+        "OPT_JELLYSEERR": "ON"
       }
-    },
-    {
-      "name": "mpd",
-      "displayName": "servarr, traefik, mympd and mpd",
-      "description": "lidarr, prowlarr, sonarr, radarr, transmission, traefik, mympd and mpd",
-      "inherits": "base",
-      "cacheVariables": {
-        "OPT_PROWLARR": "ON",
-        "OPT_LIDARR":   "ON",
-        "OPT_RADARR":   "ON",
-        "OPT_SONARR":   "ON",
-        "OPT_MYMPD":    "ON",
-        "OPT_TRAEFIK":  "ON",
-        "OPT_TRANSMISSION": "ON"
-      }
-    },
-    {
-      "name": "all",
-      "hidden": true,
-      "displayName": "all on (not usable)",
-      "description": "for debug, generates everythings everywhere",
-      "inherits": "base",
-      "cacheVariables": {
-        "OPT_PROWLARR": "ON",
-        "OPT_LIDARR":   "ON",
-        "OPT_RADARR":   "ON",
-        "OPT_SONARR":   "ON",
-        "OPT_OPENRC":   "ON",
-        "OPT_NGINX":    "ON",
-        "OPT_MPD":      "ON",
-        "OPT_MYMPD":    "ON",
-        "OPT_QBITTORRENT":  "ON",
-        "OPT_TRANSMISSION": "ON"
-      }
-    }
-  ],
-  "buildPresets": [
-    {
-      "name": "logs",
-      "configurePreset": "base",
-      "targets": [ "logs"]
-    },
-    {
-      "name": "start",
-      "configurePreset": "base",
-      "targets": [ "start"]
-    },
-    {
-      "name": "stop",
-      "configurePreset": "base",
-      "targets": [ "stop"]
     }
   ]
 }
