@@ -8,15 +8,27 @@ function(set_service_workdir path)
   set(WORK_DIR ${path} PARENT_SCOPE)
 endfunction()
 
-# create some data directories that can be use to test the services -- optional
-function(add_data)
+function(add_data_dir)
   if(DEFINED WORK_DIR)
     file(MAKE_DIRECTORY 
-    ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/downloads
-    ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/music
-    ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/series
-    ${CMAKE_BINARY_DIR}/${WORK_DIR}/data/movies
+    ${CMAKE_BINARY_DIR}/${WORK_DIR}/${DATA_DIRECTORY_PATH}/downloads
+    ${CMAKE_BINARY_DIR}/${WORK_DIR}/${DATA_DIRECTORY_PATH}/music
+    ${CMAKE_BINARY_DIR}/${WORK_DIR}/${DATA_DIRECTORY_PATH}/series
+    ${CMAKE_BINARY_DIR}/${WORK_DIR}/${DATA_DIRECTORY_PATH}/movies
     )
+
+    cmake_path(IS_RELATIVE DATA_DIRECTORY_PATH IS_DATA_PATH_RELATIVE)
+    if(${IS_DATA_PATH_RELATIVE})
+      message(STATUS "Data path is relative to install directory! Media directories will be created from the install path")
+      install(DIRECTORY ${CMAKE_BINARY_DIR}/${WORK_DIR}/${DATA_DIRECTORY_PATH} 
+              DESTINATION ${INSTALL_VAR}/${CMAKE_PROJECT_NAME})
+    else()
+      message(STATUS "Data path is absolute, your user need to be allowed to create directories at this location!")
+      install(DIRECTORY ${CMAKE_BINARY_DIR}/${WORK_DIR}/${DATA_DIRECTORY_PATH} 
+              DESTINATION ${DATA_DIRECTORY_PATH}
+      )
+    endif()
+
   else()
     message(FATAL_ERROR  "Can't create data directory: WORK_DIR not defined! use set_service_workdir() before.")
   endif()

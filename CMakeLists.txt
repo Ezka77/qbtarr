@@ -29,9 +29,10 @@ include(AddDcfCommand)
 set_service_workdir(${GEN_DIR}/${CMAKE_PROJECT_NAME})
 
 # add default data directories (for tests) -- target ?
-add_data()
+add_data_dir()
 
 # services
+message("Enabled services:")
 add_service(prowlarr)
 add_service(lidarr)
 add_service(radarr)
@@ -51,4 +52,6 @@ add_compose()
 
 # ugly shortcut scripts
 add_dcf()
+
+
 
