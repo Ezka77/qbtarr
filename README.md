@@ -1,4 +1,4 @@
-# QBTarr - A multi servarr docker, with some jelly
+# QBTarr - Servarr docker, with some jelly
 
 The idea is to generate a `compose.yml` file for `docker compose` with the services (sonarr, radarr, jellyfin, ...) configured to be accessed through a proxy (Traefik) via a subpath URL.
 
@@ -59,14 +59,16 @@ docker compose up -d
 
 Eventually you should have access to the configured services to theses adresses:
 
-- http://localhost/prowlarr
-- http://localhost/sonarr
-- http://localhost/radarr
-- http://localhost/lidarr
-- http://localhost/bazarr
-- http://localhost/qb
-- http://localhost/jellyfin
-- jellyseerr: http://localhost:5055
+| service | localhost uri |
+| --- | --- |
+| prowlarr    | http://localhost/prowlarr |
+| sonarr      | http://localhost/sonarr |
+| radarr      | http://localhost/radarr |
+| lidarr      | http://localhost/lidarr |
+| bazarr      | http://localhost/bazarr |
+| qbittorrent | http://localhost/qb |
+| jellyfin    | http://localhost/jellyfin |
+| jellyseerr  | http://localhost:5055 |
 
 Next is to configure your services as required (see https://wiki.servarr.com/)
 
@@ -76,12 +78,14 @@ Next is to configure your services as required (see https://wiki.servarr.com/)
 You should configure Prowlarr with some indexers, next add sonarr, radarr and lidarr to prowlarr.
 Each container can access to the other ones by using dns names:
 
-- prowlarr: `http://prowlarr:9696/prowlarr`
-- sonarr: `http://sonarr:8989/sonarr`
-- radarr: `http://radarr:7878/radarr`
-- lidarr: `http://lidarr:8686/lidarr`
-- qbittorrent: `http://qbittorrent:8080`
-- jellyfin: `http://jellyfin:8096/jellyfin`
+| service | in docker uri |
+| --- | --- |
+| prowlarr    | `http://prowlarr:9696/prowlarr` |
+| sonarr      | `http://sonarr:8989/sonarr` |
+| radarr      | `http://radarr:7878/radarr` |
+| lidarr      | `http://lidarr:8686/lidarr` |
+| qbittorrent | `http://qbittorrent:8080` |
+| jellyfin    | `http://jellyfin:8096/jellyfin` |
 
 For exemple the sonarr uri from prowlarr is `http://sonarr:8989/sonarr` and sonarr can access to prowlarr by using the uri `http://prowlarr:9696/prowlarr`.
 
@@ -91,8 +95,6 @@ To do so, for your first connection you can look the qbittorrent logs, it create
 ```
 docker compose logs qbittorrent
 ```
-
-For more help see https://wiki.servarr.com/
 
 ## Container updates
 
