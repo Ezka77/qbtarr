@@ -39,15 +39,23 @@ Assume you don't understand anything above (or for any other reason) and you wan
 cmake --preset default
 ```
 
+## The DATA_DIRECTORY_PATH
+
+Set this variable to point where you want to store your medias. Again use `ccmake` for that:
+
+```
+ccmake build
+```
+
 ## Installation
 
-By default the generated files are installed in `/var/lib/qbtarr`:
+To change the default install path, use `ccmake build`, edit the `CMAKE_INSTALL_PREFIX` value, hit `c` for `configure` to save and next `g` to propagate your changes to the install scripts.
+By default the generated files are installed in `/var/lib/qbtarr`. 
 ```
 cd build
 make install
 ```
 
-To change the default install path, use `ccmake` and edit the `CMAKE_INSTALL_PREFIX` value.
 
 ## Servarr'n'Jelly Configuration
 
