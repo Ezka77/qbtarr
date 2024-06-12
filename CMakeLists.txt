@@ -9,7 +9,7 @@ if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 endif()
 
 # Add source cmake dir to module path
-list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
+list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
 set(INSTALL_VAR var/lib)
 set(DATA_DIRECTORY_PATH ./data CACHE PATH "path to shared directory")
