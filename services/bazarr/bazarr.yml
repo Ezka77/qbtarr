@@ -7,8 +7,7 @@ services:
       - srv.env
     volumes:
       - ./services/bazarr/config:/config
-      - movies:/movies #optional
-      - series:/tv #optional
+      - data:/data
     ports:
       - 6767:6767
     restart: unless-stopped
