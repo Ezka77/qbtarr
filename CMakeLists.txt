@@ -3,15 +3,13 @@ cmake_minimum_required(VERSION 3.27)
 # no LANGUAGES ... I use cmake to generate configuration
 project(qbtarr VERSION 0.0.1 LANGUAGES)
 
-# For now: if install prefix is default-ed use /
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
-  set(CMAKE_INSTALL_PREFIX "/" CACHE PATH "..." FORCE)
+  set(CMAKE_INSTALL_PREFIX "/var/lib" CACHE PATH "..." FORCE)
 endif()
 
 # Add source cmake dir to module path
 list(APPEND CMAKE_MODULE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/cmake)
 
-set(INSTALL_VAR var/lib)
 set(DATA_DIRECTORY_PATH ./data CACHE PATH "path to shared directory")
 
 # containers env -- configured from ccmake
@@ -52,6 +50,3 @@ add_compose()
 
 # ugly shortcut scripts
 add_dcf()
-
-
-

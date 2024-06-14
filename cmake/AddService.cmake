@@ -21,7 +21,7 @@ function(add_data_dir)
 
       message(STATUS "Data path is relative to install directory! Media directories will be created from the install path")
       install(DIRECTORY ${CMAKE_BINARY_DIR}/${WORK_DIR}/${DATA_DIRECTORY_PATH} 
-              DESTINATION ${INSTALL_VAR}/${CMAKE_PROJECT_NAME})
+              DESTINATION ${CMAKE_PROJECT_NAME})
     else()
       message(STATUS "Media directories will be created at ${DATA_DIRECTORY_PATH}, be sure your user have write permissions")
       install(DIRECTORY DESTINATION ${DATA_DIRECTORY_PATH}/downloads)
@@ -70,17 +70,20 @@ function(add_service name)
   message(STATUS ${name})
 
   # on install do not overwrite if a service already exist ; installation = copy the service directory to the destination
-  set(SERVICE_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/${INSTALL_VAR}/${CMAKE_PROJECT_NAME}/services)
+  set(SERVICE_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}/services)
   cmake_path(ABSOLUTE_PATH SERVICE_INSTALL_PATH NORMALIZE OUTPUT_VARIABLE SERVICE_INSTALL_PATH)
-  install(CODE "
-  if(NOT EXISTS ${SERVICE_INSTALL_PATH}/${name})
-      file(INSTALL ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/${name}
-        DESTINATION ${SERVICE_INSTALL_PATH}
-        USE_SOURCE_PERMISSIONS)
-    else()
-      message(STATUS  \"${name} not installed: this service already exist at destination.\")
-    endif()"
-  )
+  # install(CODE "
+  # if(NOT EXISTS ${SERVICE_INSTALL_PATH}/${name})
+  #     file(INSTALL ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/${name}
+  #       DESTINATION ${SERVICE_INSTALL_PATH}
+  #       USE_SOURCE_PERMISSIONS)
+  #   else()
+  #     message(STATUS  \"${name} not installed: this service already exist at destination.\")
+  #   endif()"
+  # )
+  install(DIRECTORY ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/${name}
+          DESTINATION ${SERVICE_INSTALL_PATH}
+          USE_SOURCE_PERMISSIONS)
 endfunction()
 
 function(add_compose)
@@ -102,6 +105,6 @@ function(add_compose)
   install(FILES 
     ${CMAKE_BINARY_DIR}/${WORK_DIR}/compose.yml
     ${CMAKE_BINARY_DIR}/${WORK_DIR}/srv.env
-    DESTINATION ${INSTALL_VAR}/${CMAKE_PROJECT_NAME}
+    DESTINATION ${CMAKE_PROJECT_NAME}
     )
 endfunction()
