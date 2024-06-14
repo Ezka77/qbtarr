@@ -6,7 +6,7 @@ The idea is to generate a `compose.yml` file for `docker compose` with the servi
 
 - docker
 - cmake
-- ccmake
+- ccmake (optionnal)
 
 ## How to use
 
@@ -16,46 +16,33 @@ git clone https://github.com/Ezka77/qbtarr.git
 cd qbtarr
 ```
 
-### The eazy way
+### Configure your install
 
-Create the `build` directory and generate the base configuration and directories layout:
-```
-cmake -B build
-```
-
-Personnalize your services by enabling them with ccmake for exemple (or any cmake-gui tool):
-```
-ccmake build
-```
-
-I would advise to start with Traefik, Prowlarr and QBittorrent. Make everything work together and then start adding the other services.
-You can add as much servarr as wanted by running `ccmake` and switch them to `ON` and repeat the next install command.
-When a service switch is `OFF` then the service entry is removed from the main `compose.yml`, the service directory is NOT deleted.
-
-###  The lazy way -- if not using the eazy way above
-
-Assume you don't understand anything above (or for any other reason) and you want to start the next step asap
+To get bazarr, sonarr, radarr, prowlarr, lidarr, qbittorrent, jellyfin and jellyseerr:
 ```
 cmake --preset default
 ```
 
-## The DATA_DIRECTORY_PATH
-
-Set this variable to point where you want to store your medias. Again use `ccmake` for that:
-
+By default it will install this project in `/var/lib`; to install else where use `--install-prefix`
 ```
-ccmake build
+cmake --preset default --install-prefix /tmp/whatever
 ```
 
-## Installation
-
-To change the default install path, use `ccmake build`, edit the `CMAKE_INSTALL_PREFIX` value, hit `c` for `configure` to save and next `g` to propagate your changes to the install scripts.
-By default the generated files are installed in `/var/lib/qbtarr`. 
+You can configure your media directory path with `DDATA_DIRECTORY_PATH`, for exemple to put all your downloads in `/srv/media` use the command like so:
 ```
-cd build
-make install
+cmake --preset default -DDATA_DIRECTORY_PATH=/srv/media
 ```
+The installation will create `downloads`, `movies`, `music` and `series` directories. 
 
+#### Advanced
+
+Use `ccmake` to configure everything. You can use Transmission instead of QBittorrent, and remove undesired services.
+
+### Install
+
+```
+cmake --install build
+```
 
 ## Servarr'n'Jelly Configuration
 
@@ -81,10 +68,10 @@ Eventually you should have access to the configured services to theses adresses:
 Next is to configure your services as required (see https://wiki.servarr.com/)
 
 
-### First step
+### Configuration tips
 
-You should configure Prowlarr with some indexers, next add sonarr, radarr and lidarr to prowlarr.
-Each container can access to the other ones by using dns names:
+Start by configuring Prowlarr and QBittorrent; next configure sonarr, radarr and lidarr, add them to prowlarr and find some indexers.
+Each container can access to the other ones by using docker containers names:
 
 | service | in docker uri |
 | --- | --- |
@@ -106,7 +93,8 @@ docker compose logs qbittorrent
 
 ## Container updates
 
-To download new versions of the images, from the installation directory you can call this command:
+To download new versions of the images, from the installation directory you can run this command:
 ```
 docker compose up -d --pull always
 ```
+NB: A monthly/weekly cron job should be enough
