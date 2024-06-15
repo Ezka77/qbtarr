@@ -1,4 +1,5 @@
 # Utility module to add a service
+option(FORCE_INSTALL "overwrite local install" OFF)
 
 # List of string shared by these next functions to create a list of services to add to the yaml compose file
 set(INCLUDE_LIST "# enabled services\ninclude:")
@@ -72,18 +73,21 @@ function(add_service name)
   # on install do not overwrite if a service already exist ; installation = copy the service directory to the destination
   set(SERVICE_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/${CMAKE_PROJECT_NAME}/services)
   cmake_path(ABSOLUTE_PATH SERVICE_INSTALL_PATH NORMALIZE OUTPUT_VARIABLE SERVICE_INSTALL_PATH)
-  # install(CODE "
-  # if(NOT EXISTS ${SERVICE_INSTALL_PATH}/${name})
-  #     file(INSTALL ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/${name}
-  #       DESTINATION ${SERVICE_INSTALL_PATH}
-  #       USE_SOURCE_PERMISSIONS)
-  #   else()
-  #     message(STATUS  \"${name} not installed: this service already exist at destination.\")
-  #   endif()"
-  # )
-  install(DIRECTORY ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/${name}
-          DESTINATION ${SERVICE_INSTALL_PATH}
-          USE_SOURCE_PERMISSIONS)
+  if (${FORCE_INSTALL})
+    install(DIRECTORY ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/${name}
+            DESTINATION ${SERVICE_INSTALL_PATH}
+            USE_SOURCE_PERMISSIONS)
+  else()
+    install(CODE "
+      if(NOT EXISTS ${SERVICE_INSTALL_PATH}/${name})
+          file(INSTALL ${CMAKE_BINARY_DIR}/${WORK_DIR}/services/${name}
+            DESTINATION ${SERVICE_INSTALL_PATH}
+            USE_SOURCE_PERMISSIONS)
+        else()
+          message(STATUS  \"${name} not installed: this service already exist at destination.\")
+        endif()"
+    )
+  endif()
 endfunction()
 
 function(add_compose)
