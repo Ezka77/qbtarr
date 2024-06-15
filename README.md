@@ -23,16 +23,16 @@ To get bazarr, sonarr, radarr, prowlarr, lidarr, qbittorrent, jellyfin and jelly
 cmake --preset default
 ```
 
-By default it will install this project in `/var/lib`; to install else where use `--install-prefix`
-```
-cmake --preset default --install-prefix /tmp/whatever
-```
+#### Personnalize your installation
 
-You can configure your media directory path with `DDATA_DIRECTORY_PATH`, for exemple to put all your downloads in `/srv/media` use the command like so:
-```
-cmake --preset default -DDATA_DIRECTORY_PATH=/srv/media
-```
+By default it will install this project in `/var/lib`; use `--install-prefix` to set your install path.
+You can configure your media directory path with `DATA_DIRECTORY_PATH`, for exemple you can set up your directories with `/srv/media`. Be sure that your user have write permission.
 The installation will create `downloads`, `movies`, `music` and `series` directories. 
+
+All together:
+```
+cmake --preset default --install-prefix /tmp/whatever -DDATA_DIRECTORY_PATH=/srv/media
+```
 
 #### Advanced
 
@@ -40,9 +40,11 @@ Use `ccmake` to configure everything. You can use Transmission instead of QBitto
 
 ### Install
 
+Simply run:
 ```
 cmake --install build
 ```
+
 
 ## Servarr'n'Jelly Configuration
 
