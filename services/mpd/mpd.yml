@@ -9,14 +9,18 @@ services:
     restart: unless-stopped
     env_file:
       - srv.env
+    environment:
+      - PIPEWIRE_RUNTIME_DIR=/var/run/pipewire
     ports:
       - "8000:8000"
       - "6600:6600"
     volumes:
       - ./services/mpd/config:/config
       - music:/music:ro
-    devices:
-     - /dev/snd
+      - /var/run/pipewire/pipewire-0:/var/run/pipewire/pipewire-0
+    ## To allow direct device access if no pipewire
+    # devices:
+    #  - /dev/snd
     networks:
       - dcsnet
     # healthcheck:
