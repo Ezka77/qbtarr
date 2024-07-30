@@ -20,7 +20,10 @@ function(add_data_dir)
           ${CMAKE_BINARY_DIR}/${WORK_DIR}/${DATA_DIRECTORY_PATH}/movies
       )
 
-      message(STATUS "Data path is relative to install directory! Media directories will be created from the install path")
+      # to display the full install path of the data directory
+      set(QB_INSTALL_PATH ${CMAKE_INSTALL_PREFIX}/${DATA_DIRECTORY_PATH})
+      cmake_path(NORMAL_PATH QB_INSTALL_PATH)
+      message(STATUS "Data path is relative to install directory! Media directories will be created from the install path: ${QB_INSTALL_PATH}")
       install(DIRECTORY ${CMAKE_BINARY_DIR}/${WORK_DIR}/${DATA_DIRECTORY_PATH} 
               DESTINATION ${CMAKE_PROJECT_NAME})
     else()

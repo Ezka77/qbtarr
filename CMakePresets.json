@@ -14,16 +14,23 @@
       "description": "servarrs, qbittorrent and some jelly with traefik as reverse proxy",
       "inherits": "base",
       "cacheVariables": {
-        "OPT_TRAEFIK":  "ON",
+        "OPT_TRAEFIK": "ON",
         "OPT_PROWLARR": "ON",
-        "OPT_LIDARR":   "ON",
-        "OPT_RADARR":   "ON",
-        "OPT_SONARR":   "ON",
-        "OPT_BAZARR":   "ON",
+        "OPT_LIDARR": "ON",
+        "OPT_RADARR": "ON",
+        "OPT_SONARR": "ON",
+        "OPT_BAZARR": "ON",
         "OPT_QBITTORRENT": "ON",
         "OPT_JELLYFIN": "ON",
         "OPT_JELLYSEERR": "ON"
       }
+    },
+    {
+      "name": "local",
+      "displayName": "servarr for local user",
+      "description": "install servarr in ~/.local/share/",
+      "inherits": "default",
+      "installDir": "~/.local/share"
     }
   ]
 }

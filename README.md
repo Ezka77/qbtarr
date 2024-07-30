@@ -18,12 +18,24 @@ cd qbtarr
 
 ### Configure your install
 
-To get bazarr, sonarr, radarr, prowlarr, lidarr, qbittorrent, jellyfin and jellyseerr:
+#### Use a preset
+
+To install qbtarr under your current linux user:
+
+```
+cmake --preset local
+cmake --install build
+```
+
+Everything will be install in: `~/.local/share/qbtarr` and you're done, you can jump to the configuration part.
+
+#### OR to personnalize your installation
+
+You can use the `default` or `local` preset, the only diffecences is the default install directory.
+
 ```
 cmake --preset default
 ```
-
-#### Personnalize your installation
 
 By default it will install this project in `/var/lib`; use `--install-prefix` to set your install path.
 You can configure your media directory path with `DATA_DIRECTORY_PATH`, for exemple you can set up your directories with `/srv/media`. Be sure that your user have write permission.
@@ -48,9 +60,9 @@ cmake --install build
 
 ## Servarr'n'Jelly Configuration
 
-Next start the services from the install directory:
+Next start the services from the install directory, for exemple if you use the `local` preset:
 ```
-cd /var/lib/qbtarr
+cd ~/.local/share/qbtarr
 docker compose up -d
 ```
 
@@ -99,4 +111,4 @@ To download new versions of the images, from the installation directory you can 
 ```
 docker compose up -d --pull always
 ```
-NB: A monthly/weekly cron job should be enough
+NB: A monthly/weekly cron job should be enough to keep the containers up to date.
