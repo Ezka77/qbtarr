@@ -24,7 +24,7 @@ services:
       - music:/music:ro
       - ./services/mpd/config/playlists:/playlists:ro
     networks:
-      - dcsnet
+      - qbtarrnet
     labels:
       - "traefik.enable=true"
       - "traefik.http.routers.mympd.entrypoints=http"

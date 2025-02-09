@@ -41,5 +41,3 @@ volumes:
 networks:
   qbtarrnet:
     name: qbtarrnet
-  dcsnet:
-    name: dcsnet

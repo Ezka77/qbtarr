@@ -1,4 +1,4 @@
----
+
 services:
   bazarr:
     image: lscr.io/linuxserver/bazarr:latest
@@ -8,8 +8,8 @@ services:
     volumes:
       - ./services/bazarr/config:/config
       - data:/data
-    ports:
-      - 6767:6767
+    #ports:
+    #  - 6767:6767
     restart: unless-stopped
     networks:
       - qbtarrnet

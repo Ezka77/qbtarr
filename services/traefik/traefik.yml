@@ -1,6 +1,6 @@
 services:
   traefik:
-    image: traefik:latest
+    image: traefik:v3
     container_name: traefik
     restart: unless-stopped
     env_file:
@@ -14,10 +14,11 @@ services:
       - "--providers.docker.exposedbydefault=false"
       - "--api.insecure=true"
     ports:
+      # The HTTP port
       - "80:80"
-      - "8888:8080"
+      # The Web UI (enabled by --api.insecure=true)
+      - "8585:8080"
     volumes:
-      - "/var/run/docker.sock:/var/run/docker.sock:ro"
+      - /var/run/docker.sock:/var/run/docker.sock
     networks:
       - qbtarrnet
-      - dcsnet

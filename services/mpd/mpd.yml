@@ -18,11 +18,10 @@ services:
       - ./services/mpd/config:/config
       - music:/music:ro
       - /var/run/pipewire/pipewire-0:/var/run/pipewire/pipewire-0
-    ## To allow direct device access if no pipewire
-    # devices:
-    #  - /dev/snd
+    devices:
+     - /dev/snd
     networks:
-      - dcsnet
+      - qbtarrnet
     # healthcheck:
     #   test: nc -nz -w3 127.0.0.1 6600 || exit 1
     #   interval: 20s

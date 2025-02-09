@@ -15,7 +15,7 @@ services:
     volumes:
       - ./services/transmission/config:/config
       - ./services/transmission/watch:/watch
-      - data/downloads:/downloads
+      - downloads:/downloads
     ports:
       - "9091:9091"
       - "51413:51413"
